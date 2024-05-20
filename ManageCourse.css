@@ -1,0 +1,25 @@
+
+.manage-course {
+    margin: 20px auto;
+    width: 100%;
+}
+
+.grid-container {
+    padding: 20px;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+.form-container {
+    margin-bottom: 20px;
+}
+
+.submit-button {
+    margin-top: 30px;
+}
+
+.table {
+    margin-top: 20px;
+}

@@ -1,0 +1,88 @@
+/* LoginPage.css */
+body {
+    background-color: #fff;
+  }
+  
+  h2.ui.header {
+    color: #333 !important;
+    font-size: 24px !important;
+    margin-bottom: 30px !important;
+  }
+  
+  .ui.form .field > input {
+    border-radius: 8px !important;
+    border: none !important;
+    background-color: #f7f9fc !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    font-size: 18px !important;
+    padding: 15px !important;
+    height: 60px !important; /* Increase height */
+    width: 100% !important;
+  }
+  
+  .ui.form .field > input:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px #dcdcdc !important;
+  }
+  
+  .input-field {
+    margin-bottom: 15px !important;
+  }
+  
+  .password-wrapper {
+    position: relative;
+  }
+  
+  .password-wrapper input {
+    width: 100% !important;
+    height: 60px !important; /* Ensure consistent height with username input */
+  }
+  
+  .forgot-link {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bbb;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  
+  .forgot-link:hover {
+    color: #888;
+  }
+  
+  .ui.button {
+    background-color: #4a90e2 !important;
+    border-radius: 8px !important;
+    color: white !important;
+    font-size: 18px !important;
+    height: 60px !important; /* Increase height */
+    border: none !important;
+  }
+  
+  .ui.button:hover {
+    background-color: #357abd !important;
+  }
+  
+  .ui.grid > .column {
+    padding: 0 !important;
+  }
+  
+  .ui.dividing.header:after {
+    border-color: #ddd !important;
+  }
+  
+  .ui.dividing.header:before {
+    border-color: #ddd !important;
+  }
+  
+  .ui.container {
+    max-width: 450px;
+    padding: 30px;
+  }
+  
+  .ui.grid > .column {
+    padding: 30px;
+  }
+  
