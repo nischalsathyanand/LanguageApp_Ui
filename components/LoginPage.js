@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, Grid, Header } from 'semantic-ui-react';
 import { useNavigate } from 'react-router-dom';
-import '../public/css/LoginPage.css'; // Import a custom CSS file for additional styling
+import '../public/css/LoginPage.css'; 
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -11,13 +11,15 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:3000/user/v1/login", {
+      const response = await fetch("http://localhost:3000/user/v1/login", 
+      {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
-      });
+      }
+    );
 
       if (!response.ok) {
         throw new Error('Invalid email or password');

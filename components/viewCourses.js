@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Segment, Header, Grid, Step, Form, Button, Table } from 'semantic-ui-react';
+import { Form, Button, Table, Container, Header, Divider, Message, Dimmer, Loader } from 'semantic-ui-react';
 
 const ViewCourses = () => {
     const [languages, setLanguages] = useState([]);
@@ -9,46 +9,96 @@ const ViewCourses = () => {
     const [selectedChapter, setSelectedChapter] = useState('');
     const [selectedLesson, setSelectedLesson] = useState('');
     const [questions, setQuestions] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        // Fetch all languages when the component mounts
+        fetchLanguages();
+    }, []);
+
+    const fetchLanguages = () => {
+        setLoading(true);
+        setError('');
+
         fetch('http://localhost:3000/api/v1/languages')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch languages');
+                }
+                return response.json();
+            })
             .then(data => {
                 setLanguages(data);
+                setLoading(false);
             })
             .catch(error => {
                 console.error('Error fetching languages:', error);
+                setError('Failed to fetch languages');
+                setLoading(false);
             });
-    }, []);
+    };
 
     const handleLanguageChange = (e, { value }) => {
         setSelectedLanguage(value);
-        // Fetch chapters for the selected language
-        fetch(`http://localhost:3000/api/v1/languages/${value}/chapters`)
-            .then(response => response.json())
+        setSelectedChapter('');
+        setSelectedLesson('');
+        setChapters([]);
+        setLessons([]);
+        setQuestions([]);
+
+        fetchChapters(value);
+    };
+
+    const fetchChapters = (languageId) => {
+        setLoading(true);
+        setError('');
+
+        fetch(`http://localhost:3000/api/v1/languages/${languageId}/chapters`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch chapters');
+                }
+                return response.json();
+            })
             .then(data => {
                 setChapters(data);
-                setSelectedChapter('');  // Reset selected chapter
-                setLessons([]);  // Reset lessons
-                setSelectedLesson('');  // Reset selected lesson
+                setLoading(false);
             })
             .catch(error => {
                 console.error('Error fetching chapters:', error);
+                setError('Failed to fetch chapters');
+                setLoading(false);
             });
     };
 
     const handleChapterChange = (e, { value }) => {
         setSelectedChapter(value);
-        // Fetch lessons for the selected chapter and language
-        fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}/chapters/${value}/lessons`)
-            .then(response => response.json())
+        setSelectedLesson('');
+        setLessons([]);
+        setQuestions([]);
+
+        fetchLessons(selectedLanguage, value);
+    };
+
+    const fetchLessons = (languageId, chapterId) => {
+        setLoading(true);
+        setError('');
+
+        fetch(`http://localhost:3000/api/v1/languages/${languageId}/chapters/${chapterId}/lessons`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch lessons');
+                }
+                return response.json();
+            })
             .then(data => {
                 setLessons(data);
-                setSelectedLesson('');  // Reset selected lesson
+                setLoading(false);
             })
             .catch(error => {
                 console.error('Error fetching lessons:', error);
+                setError('Failed to fetch lessons');
+                setLoading(false);
             });
     };
 
@@ -57,103 +107,117 @@ const ViewCourses = () => {
     };
 
     const handleSubmit = () => {
-        // Fetch questions based on selected language, chapter, and lesson
+        setLoading(true);
+        setError('');
+
         fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}/chapters/${selectedChapter}/lessons/${selectedLesson}/questions`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch questions');
+                }
+                return response.json();
+            })
             .then(data => {
                 setQuestions(data);
+                setLoading(false);
             })
             .catch(error => {
                 console.error('Error fetching questions:', error);
+                setError('Failed to fetch questions');
+                setLoading(false);
             });
     };
 
-    const languageOptions = languages.map(language => ({
-        key: language._id,
-        text: language.name,
-        value: language._id
-    }));
-
-    const chapterOptions = chapters.map(chapter => ({
-        key: chapter._id,
-        text: chapter.name,
-        value: chapter._id
-    }));
-
-    const lessonOptions = lessons.map(lesson => ({
-        key: lesson._id,
-        text: lesson.name,
-        value: lesson._id
+    const createOptions = (data) => data.map(item => ({
+        key: item._id,
+        text: item.name,
+        value: item._id
     }));
 
     return (
-        <>
-            <Form style={{ marginBottom: '20px' }}>
+        <Container>
+            <Header as="h2" style={{ marginTop: '20px' }}>View Courses</Header>
+            
+            {error && <Message negative>{error}</Message>}
+
+            <Form className="form" style={{ marginBottom: '20px' }}>
                 <Form.Group widths='equal'>
                     <Form.Dropdown
                         label='Select Language'
                         placeholder='Select Language'
                         fluid
                         selection
-                        options={languageOptions}
+                        options={createOptions(languages)}
                         onChange={handleLanguageChange}
+                        value={selectedLanguage}
+                        className="select"
+                        loading={loading}
                     />
                     <Form.Dropdown
                         label='Select Chapter'
                         placeholder='Select Chapter'
                         fluid
                         selection
-                        options={chapterOptions}
+                        options={createOptions(chapters)}
                         onChange={handleChapterChange}
+                        value={selectedChapter}
                         disabled={!selectedLanguage}
+                        className="select"
+                        loading={loading}
                     />
                     <Form.Dropdown
                         label='Select Lesson'
                         placeholder='Select Lesson'
                         fluid
                         selection
-                        options={lessonOptions}
+                        options={createOptions(lessons)}
                         onChange={handleLessonChange}
+                        value={selectedLesson}
                         disabled={!selectedChapter}
+                        className="select"
+                        loading={loading}
                     />
-                    <Button color='blue' style={{ marginTop: '25px' }} onClick={handleSubmit}>
-                        Submit
-                    </Button>
                 </Form.Group>
+                <Button color='blue' style={{ marginTop: '20px' }} onClick={handleSubmit} loading={loading}>
+                    Submit
+                </Button>
             </Form>
+
+            <Divider />
+
+            {loading && (
+                <Dimmer active inverted>
+                    <Loader inverted>Loading</Loader>
+                </Dimmer>
+            )}
+
             {questions.length > 0 && (
-                <Table celled selectable style={{ marginTop: '20px' }}>
+                <Table celled selectable className="table">
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell>Order ID</Table.HeaderCell>
                             <Table.HeaderCell>Question Type</Table.HeaderCell>
                             <Table.HeaderCell>Text</Table.HeaderCell>
                             <Table.HeaderCell>Image 1</Table.HeaderCell>
-                            <Table.HeaderCell>Image 2</Table.HeaderCell>
                             <Table.HeaderCell>Audio 1</Table.HeaderCell>
-                            <Table.HeaderCell>Audio 2</Table.HeaderCell>
-                            <Table.HeaderCell>Answer Text</Table.HeaderCell>
                             <Table.HeaderCell>ID</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {questions.map((question, index) => (
-                            <Table.Row key={index}>
+                        {questions.map((question) => (
+                            <Table.Row key={question._id}>
                                 <Table.Cell>{question.order_id}</Table.Cell>
                                 <Table.Cell>{question.question_type}</Table.Cell>
                                 <Table.Cell>{question.text}</Table.Cell>
                                 <Table.Cell>{question.image1}</Table.Cell>
-                                <Table.Cell>{question.image2}</Table.Cell>
                                 <Table.Cell>{question.audio1}</Table.Cell>
-                                <Table.Cell>{question.audio2}</Table.Cell>
-                                <Table.Cell>{question.answerText}</Table.Cell>
                                 <Table.Cell>{question._id}</Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>
                 </Table>
             )}
-        </>
+        </Container>
     );
 };
 
