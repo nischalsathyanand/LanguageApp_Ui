@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Dropdown, Container, Header, Icon, Segment, Divider, List, Modal } from 'semantic-ui-react';
+import { Form, Button, Dropdown, Container, Header, Segment, Divider, Modal, Message, Loader ,Icon} from 'semantic-ui-react';
 
 const AddCourse = ({ setActiveStep }) => {
   const [languageName, setLanguageName] = useState('');
@@ -20,6 +20,8 @@ const AddCourse = ({ setActiveStep }) => {
   const [audio2, setAudio2] = useState('');
   const [answerText, setAnswerText] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ content: '', type: '' });
 
   useEffect(() => {
     fetchLanguages();
@@ -27,10 +29,13 @@ const AddCourse = ({ setActiveStep }) => {
 
   const fetchLanguages = async () => {
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:3000/api/v1/languages');
       const data = await response.json();
       setLanguages(data);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error('Error fetching languages:', error);
     }
   };
@@ -68,6 +73,7 @@ const AddCourse = ({ setActiveStep }) => {
   const handleLanguageSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:3000/api/v1/languages', {
         method: 'POST',
         headers: {
@@ -78,7 +84,11 @@ const AddCourse = ({ setActiveStep }) => {
       const data = await response.json();
       setLanguages([...languages, data]);
       setLanguageName('');
+      setMessage({ content: 'Language added successfully!', type: 'success' });
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
+      setMessage({ content: 'Error adding language.', type: 'error' });
       console.error('Error creating language:', error);
     }
   };
@@ -86,6 +96,7 @@ const AddCourse = ({ setActiveStep }) => {
   const handleChapterSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}/chapters`, {
         method: 'POST',
         headers: {
@@ -96,7 +107,11 @@ const AddCourse = ({ setActiveStep }) => {
       const data = await response.json();
       setChapters([...chapters, data]);
       setChapterName('');
+      setMessage({ content: 'Chapter added successfully!', type: 'success' });
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
+      setMessage({ content: 'Error adding chapter.', type: 'error' });
       console.error('Error creating chapter:', error);
     }
   };
@@ -104,6 +119,7 @@ const AddCourse = ({ setActiveStep }) => {
   const handleLessonSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}/chapters/${selectedChapter}/lessons`, {
         method: 'POST',
         headers: {
@@ -114,7 +130,11 @@ const AddCourse = ({ setActiveStep }) => {
       const data = await response.json();
       setLessons([...lessons, data]);
       setLessonName('');
+      setMessage({ content: 'Lesson added successfully!', type: 'success' });
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
+      setMessage({ content: 'Error adding lesson.', type: 'error' });
       console.error('Error creating lesson:', error);
     }
   };
@@ -122,6 +142,7 @@ const AddCourse = ({ setActiveStep }) => {
   const handleQuestionSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true);
       const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}/chapters/${selectedChapter}/lessons/${selectedLesson}/questions`, {
         method: 'POST',
         headers: {
@@ -147,7 +168,11 @@ const AddCourse = ({ setActiveStep }) => {
       setAudio2('');
       setAnswerText('');
       setModalOpen(false);
+      setMessage({ content: 'Question added successfully!', type: 'success' });
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
+      setMessage({ content: 'Error adding question.', type: 'error' });
       console.error('Error creating question:', error);
     }
   };
@@ -173,9 +198,22 @@ const AddCourse = ({ setActiveStep }) => {
   return (
     <Container className="container">
       <Header as="h2" className="title">Add New Course</Header>
+
+      {message.content && (
+        <Message
+          success={message.type === 'success'}
+          error={message.type === 'error'}
+          content={message.content}
+        />
+      )}
       
+      {loading && <Loader active inline='centered' />}
+
       <Segment raised>
-        <Header as="h3">Add Language</Header>
+        <Header as="h3" icon>
+          <Icon name="language" />
+          Add Language
+        </Header>
         <Form onSubmit={handleLanguageSubmit}>
           <Form.Group>
             <Form.Input
@@ -194,7 +232,10 @@ const AddCourse = ({ setActiveStep }) => {
       <Divider />
 
       <Segment raised>
-        <Header as="h3">Select Language</Header>
+        <Header as="h3" icon>
+          <Icon name="globe" />
+          Select Language
+        </Header>
         <Dropdown
           placeholder="Select Language"
           fluid
@@ -207,7 +248,10 @@ const AddCourse = ({ setActiveStep }) => {
       <Divider />
 
       <Segment raised>
-        <Header as="h3">Add Chapter</Header>
+        <Header as="h3" icon>
+          <Icon name="book" />
+          Add Chapter
+        </Header>
         <Form onSubmit={handleChapterSubmit}>
           <Form.Group>
             <Form.Input
@@ -226,7 +270,10 @@ const AddCourse = ({ setActiveStep }) => {
       <Divider />
 
       <Segment raised>
-        <Header as="h3">Select Chapter</Header>
+        <Header as="h3" icon>
+          <Icon name="tasks" />
+          Select Chapter
+        </Header>
         <Dropdown
           placeholder="Select Chapter"
           fluid
@@ -239,7 +286,10 @@ const AddCourse = ({ setActiveStep }) => {
       <Divider />
 
       <Segment raised>
-        <Header as="h3">Add Lesson</Header>
+        <Header as="h3" icon>
+          <Icon name="student" />
+          Add Lesson
+        </Header>
         <Form onSubmit={handleLessonSubmit}>
           <Form.Group>
             <Form.Input
@@ -258,7 +308,10 @@ const AddCourse = ({ setActiveStep }) => {
       <Divider />
 
       <Segment raised>
-        <Header as="h3">Select Lesson</Header>
+        <Header as="h3" icon>
+          <Icon name="list" />
+          Select Lesson
+        </Header>
         <Dropdown
           placeholder="Select Lesson"
           fluid
