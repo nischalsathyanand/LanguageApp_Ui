@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Table, Container, Header, Divider, Message, Dimmer, Loader } from 'semantic-ui-react';
+import { Form, Icon, Table, Container, Header, Divider, Message, Dimmer, Loader } from 'semantic-ui-react';
 
 const ViewCourses = () => {
     const [languages, setLanguages] = useState([]);
@@ -136,11 +136,11 @@ const ViewCourses = () => {
 
     return (
         <Container>
-            <Header as="h2" style={{ marginTop: '20px' }}>View Courses</Header>
+            <Header as="h2" style={{ marginTop: '20px', textAlign: 'center' }}>View Courses</Header>
             
             {error && <Message negative>{error}</Message>}
 
-            <Form className="form" style={{ marginBottom: '20px' }}>
+            <Form style={{ marginBottom: '20px', textAlign: 'center' }}>
                 <Form.Group widths='equal'>
                     <Form.Dropdown
                         label='Select Language'
@@ -178,9 +178,14 @@ const ViewCourses = () => {
                         loading={loading}
                     />
                 </Form.Group>
-                <Button color='blue' style={{ marginTop: '20px' }} onClick={handleSubmit} loading={loading}>
-                    Submit
-                </Button>
+                <Icon 
+                    name='search' 
+                    size='big' 
+                    color='blue' 
+                    style={{ marginTop: '20px', cursor: 'pointer', marginLeft: '10px' }} 
+                    onClick={handleSubmit} 
+                    loading={loading}
+                />
             </Form>
 
             <Divider />
