@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Form, Button, Message } from "semantic-ui-react";
 
-const EditLanguage = ({ language, open, onClose, onSuccess }) => {
+const EditLanguage = ({ language, open, onClose, onSuccess, onDelete }) => {
   const [editLanguageName, setEditLanguageName] = useState(language.name || "");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -25,7 +25,6 @@ const EditLanguage = ({ language, open, onClose, onSuccess }) => {
         }
         setSuccess("Language updated successfully");
         onSuccess(); // Refresh languages after update
-        onClose();
       })
       .catch((error) => {
         console.error("Error updating language:", error);
@@ -42,13 +41,16 @@ const EditLanguage = ({ language, open, onClose, onSuccess }) => {
           throw new Error("Failed to delete language");
         }
         setSuccess("Language deleted successfully");
-        onSuccess(); // Refresh languages after delete
-        onClose();
+        onDelete(); // Navigate to edit course page after delete
       })
       .catch((error) => {
         console.error("Error deleting language:", error);
         setError("Failed to delete language");
       });
+  };
+
+  const handleCancel = () => {
+    onClose();
   };
 
   return (
@@ -69,11 +71,11 @@ const EditLanguage = ({ language, open, onClose, onSuccess }) => {
         {success && <Message positive>{success}</Message>}
       </Modal.Content>
       <Modal.Actions>
-        <Button negative onClick={onClose}>
+        <Button negative onClick={handleCancel}>
           Cancel
         </Button>
         <Button positive onClick={handleEditLanguage}>
-          Update
+          Rename
         </Button>
         <Button negative onClick={handleDeleteLanguage}>
           Delete

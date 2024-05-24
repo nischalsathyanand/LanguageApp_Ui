@@ -83,22 +83,29 @@ const EditCourse = () => {
     fetchLanguages(); // Refresh languages after edit or delete
   };
 
-  const handleDeleteChapter = () => {
-    fetch(`http://localhost:3000/api/v1/chapters/${selectedChapter}`, {
+  const handleDeleteLanguage = () => {
+    fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}`, {
       method: "DELETE",
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to delete chapter");
+          throw new Error("Failed to delete language");
         }
-        setSuccess("Chapter deleted successfully");
-        handleEditChapterModalClose();
-        fetchChapters(selectedLanguage);
+        setSuccess("Language deleted successfully");
+        fetchLanguages(); // Refresh languages after delete
+        onCloseEditLanguageModal(); // Close edit language modal
       })
       .catch((error) => {
-        console.error("Error deleting chapter:", error);
-        setError("Failed to delete chapter");
+        console.error("Error deleting language:", error);
+        setError("Failed to delete language");
       });
+  };
+
+  const onCloseEditLanguageModal = () => {
+    setEditLanguageModalOpen(false);
+    setSelectedLanguage("");
+    setSuccess("");
+    setError("");
   };
 
   const handleLanguageChange = (e, { value }) => {
@@ -188,9 +195,16 @@ const EditCourse = () => {
           <EditLanguage
             language={languages.find((lang) => lang._id === selectedLanguage) || {}}
             open={editLanguageModalOpen}
-            onClose={handleEditLanguageModalClose}
+            onClose={onCloseEditLanguageModal}
             onSuccess={handleSuccess}
+            onDelete={() => {
+              handleSuccess();
+              fetchLanguages();
+              onCloseEditLanguageModal();
+            }}
           />
+
+          {/* Assume EditChapter component is similarly handled */}
 
           <EditChapter
             chapter={chapters.find((chap) => chap._id === selectedChapter) || {}}
@@ -201,7 +215,10 @@ const EditCourse = () => {
               handleSuccess();
               fetchChapters(selectedLanguage); // Refresh chapters after edit
             }}
-            onDelete={handleDeleteChapter}
+            onDelete={() => {
+              handleSuccess();
+              fetchChapters(selectedLanguage);
+            }}
           />
 
           {error && <Message negative>{error}</Message>}
@@ -213,3 +230,4 @@ const EditCourse = () => {
 };
 
 export default EditCourse;
+
