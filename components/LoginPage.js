@@ -11,35 +11,34 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:3000/user/v1/login", 
-      {
+      const response = await fetch("http://localhost:3000/user/v1/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
-      }
-    );
-
+      });
+  
       if (!response.ok) {
         throw new Error('Invalid email or password');
       }
-
+  
       const { token, userInfo } = await response.json();
       localStorage.setItem('token', token);
-
+  
       if (userInfo.role === 'superadmin') {
         navigate('/superadmin');
       } else if (userInfo.role === 'instituteadmin') {
         navigate('/instituteadmin');
       } else if (userInfo.role === 'student') {
-        navigate('/student');
+        // Navigate to '/student' and pass username in the state
+        navigate('/student', { state: { username: userInfo.username } });
       }
     } catch (error) {
       setError(error.message);
     }
   };
-
+  
   return (
     <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
       <Grid.Column style={{ maxWidth: 450 }}>

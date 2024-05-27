@@ -1,150 +1,107 @@
 import React, { useState } from 'react';
-import { Sidebar, Segment, Menu, Icon, Table, Container, Header, Grid, Button, Form } from 'semantic-ui-react';
+import { Container, Grid, Header, Icon, Menu, Segment, Sidebar, Divider, Card, Image } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
-
-const students = [
-    { name: 'Bea', xp: 1039, time: '23h 12m', lessons: '2/4 lessons' },
-    { name: 'Eddy', xp: 2983, time: '23h 12m', lessons: '3/4 lessons' },
-    { name: 'Junior', xp: 2348, time: '23h 12m', lessons: '0/4 lessons' },
-    { name: 'Lily', xp: 1482, time: '23h 12m', lessons: '4/4 lessons' },
-    { name: 'Lin', xp: 1231, time: '23h 12m', lessons: '2/4 lessons' },
-    { name: 'Lucy', xp: 957, time: '23h 12m', lessons: '0/4 lessons' },
-    { name: 'Vikra', xp: 923, time: '23h 12m', lessons: '1/4 lessons' },
-    { name: 'Zari', xp: 912, time: '23h 12m', lessons: '4/4 lessons' }
-];
+import { useNavigate } from 'react-router-dom'; 
+import ViewAllStudents from './ViewAllStudents';
+import AddNewStudent from './AddNewStudent';
 
 const InstituteAdmin = () => {
-    const [view, setView] = useState('dashboard');
-    const [formState, setFormState] = useState({
-        name: '',
-        class: '',
-        details: '',
-        username: '',
-        password: ''
-    });
+    const navigate = useNavigate();
+    const [section, setSection] = useState('viewAll');
+    const [selectedStudent, setSelectedStudent] = useState(null);
 
-    const handleInputChange = (e, { name, value }) => {
-        setFormState({ ...formState, [name]: value });
-    };
-
-    const handleAddStudent = () => {
-        // Add logic to add the student to the list
-        console.log('Student added', formState);
-        setFormState({
-            name: '',
-            class: '',
-            details: '',
-            username: '',
-            password: ''
-        });
+    const handleLogout = () => {
+        navigate("/login");
     };
 
     return (
-        <Sidebar.Pushable as={Segment} style={{ minHeight: '100vh' }}>
-            <Sidebar
-                as={Menu}
-                animation='push'
-                icon='labeled'
-                vertical
-                visible
-                width='thin'
-                style={{ backgroundColor: '#f7f7f7', padding: '1em' }}
-            >
-                <Menu.Item style={{ marginBottom: '1em', textAlign: 'center' }}>
-                    <Icon name='user circle' size='big' />
-                    <div>Mr. Oscar</div>
-                </Menu.Item>
-                <Menu.Item style={{ padding: '1em 0' }}>
-                    <Button primary style={{ width: '100%' }} onClick={() => setView('addStudent')}>Add Student</Button>
-                </Menu.Item>
-                <Menu.Item style={{ padding: '1em 0' }}>
-                    <Button secondary style={{ width: '100%' }} onClick={() => setView('dashboard')}>View Student Dashboard</Button>
-                </Menu.Item>
-                <Menu.Item style={{ padding: '1em 0' }}>
-                    <Button style={{ width: '100%' }}>Logout</Button>
-                </Menu.Item>
-            </Sidebar>
-
-            <Sidebar.Pusher>
-                <Segment basic>
-                    <Container>
-                        <Header as='h2' style={{ marginTop: '1em' }}>French 2 Period 4</Header>
-                        <Menu tabular>
-                            <Menu.Item name='students' active={view === 'dashboard'} onClick={() => setView('dashboard')} />
-                            <Menu.Item name='assignments' />
-                            <Menu.Item name='curriculum' />
-                            <Menu.Item name='settings' />
-                        </Menu>
-                        <Grid>
-                            <Grid.Row>
-                                <Grid.Column width={10}>
-                                    {view === 'dashboard' && (
-                                        <Table celled style={{ marginTop: '1em' }}>
-                                            <Table.Header>
-                                                <Table.Row>
-                                                    <Table.HeaderCell>Name</Table.HeaderCell>
-                                                    <Table.HeaderCell>XP This Week</Table.HeaderCell>
-                                                    <Table.HeaderCell>Time This Week</Table.HeaderCell>
-                                                    <Table.HeaderCell>Latest Assignment</Table.HeaderCell>
-                                                </Table.Row>
-                                            </Table.Header>
-                                            <Table.Body>
-                                                {students.map(student => (
-                                                    <Table.Row key={student.name}>
-                                                        <Table.Cell>{student.name}</Table.Cell>
-                                                        <Table.Cell>{student.xp}</Table.Cell>
-                                                        <Table.Cell>{student.time}</Table.Cell>
-                                                        <Table.Cell>{student.lessons}</Table.Cell>
-                                                    </Table.Row>
-                                                ))}
-                                            </Table.Body>
-                                        </Table>
+        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#f7f7f7', minHeight: '100vh' }}>
+            <Grid>
+                <Grid.Row>
+                    <Grid.Column width={3}>
+                        <Sidebar
+                            as={Menu}
+                            animation='overlay'
+                            icon='labeled'
+                            inverted
+                            vertical
+                            visible
+                            width='thin'
+                            style={{ backgroundColor: '#58CC02', color: '#fff', paddingTop: '4em', height: '100vh' }}
+                        >
+                            <Menu.Item header style={{ textAlign: 'center' }}>
+                                <Header as='h3' style={{ color: '#fff' }}>
+                                    Lantoon For Institute
+                                </Header>
+                            </Menu.Item>
+                            <Divider />
+                            <Menu.Item as='a' onClick={() => setSection('viewAll')} style={{ fontSize: '1.2em', color: '#fff', paddingTop: '1em' }}>
+                                <Icon name='list alternate outline' />
+                                View All Students
+                            </Menu.Item>
+                            <Menu.Item as='a' onClick={() => setSection('add')} style={{ fontSize: '1.2em', color: '#fff' }}>
+                                <Icon name='user plus' />
+                                Add Student
+                            </Menu.Item>
+                            <Menu.Item as='a' onClick={handleLogout} style={{ fontSize: '1.2em', color: '#fff' }}>
+                                <Icon name='sign-out' />
+                                Logout
+                            </Menu.Item>
+                        </Sidebar>
+                    </Grid.Column>
+                    <Grid.Column width={13} style={{ padding: '2em' }}>
+                        <Container>
+                            <Grid centered>
+                                <Grid.Row centered>
+                                    <Grid.Column textAlign='center'>
+                                        <Segment basic textAlign='center'>
+                                            <Header as='h1' style={{ color: '#333', marginBottom: '1.5em', fontWeight: 'bold' }}>
+                                                {section === 'viewAll' ? 'All Students' : 'Add New Student'}
+                                            </Header>
+                                        </Segment>
+                                    </Grid.Column>
+                                </Grid.Row>
+                                <Grid.Row centered>
+                                    <Grid.Column mobile={16} tablet={12} computer={10}>
+                                        <Segment vertical style={{ backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
+                                            {section === 'viewAll' && <ViewAllStudents setSelectedStudent={setSelectedStudent} />}
+                                            {section === 'add' && <AddNewStudent />}
+                                        </Segment>
+                                    </Grid.Column>
+                                    {selectedStudent && (
+                                        <Grid.Column mobile={16} tablet={12} computer={6}>
+                                            <Segment vertical style={{ backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
+                                                <StudentDetails student={selectedStudent} />
+                                            </Segment>
+                                        </Grid.Column>
                                     )}
-                                    {view === 'addStudent' && (
-                                        <Form style={{ marginTop: '1em' }}>
-                                            <Form.Input
-                                                label='Name'
-                                                name='name'
-                                                value={formState.name}
-                                                onChange={handleInputChange}
-                                            />
-                                            <Form.Input
-                                                label='Class'
-                                                name='class'
-                                                value={formState.class}
-                                                onChange={handleInputChange}
-                                            />
-                                            <Form.Input
-                                                label='Details'
-                                                name='details'
-                                                value={formState.details}
-                                                onChange={handleInputChange}
-                                            />
-                                            <Form.Input
-                                                label='Username'
-                                                name='username'
-                                                value={formState.username}
-                                                onChange={handleInputChange}
-                                            />
-                                            <Form.Input
-                                                label='Password'
-                                                name='password'
-                                                value={formState.password}
-                                                onChange={handleInputChange}
-                                                type='password'
-                                            />
-                                            <Button primary onClick={handleAddStudent}>Submit</Button>
-                                        </Form>
-                                    )}
-                                </Grid.Column>
-                                
-                            </Grid.Row>
-                        </Grid>
-                    </Container>
-                </Segment>
-            </Sidebar.Pusher>
-        </Sidebar.Pushable>
+                                </Grid.Row>
+                            </Grid>
+                        </Container>
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
+        </div>
     );
-}
+};
+
+const StudentDetails = ({ student }) => {
+    return (
+        <Container>
+            <Card centered style={{ boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)', marginBottom: '2em' }}>
+                <Image src={student.avatar} wrapped ui={false} />
+                <Card.Content>
+                    <Card.Header style={{ color: '#333', fontSize: '1.5em', marginBottom: '0.5em' }}>{student.username}</Card.Header>
+                    <Card.Meta style={{ color: '#666', marginBottom: '1em' }}>{student.instituteName}</Card.Meta>
+                    <Card.Description>
+                        <p style={{ color: '#333', marginBottom: '0.5em' }}><strong>Course completed:</strong> {student.chapterCompleted.join(', ')}</p>
+                        <p style={{ color: '#333', marginBottom: '0.5em' }}><strong>Last login time:</strong> {student.lastLoggedInTime}</p>
+                        <p style={{ color: '#333', marginBottom: '0' }}><strong>Time spent:</strong> {student.timeSpent}</p>
+                    </Card.Description>
+                </Card.Content>
+            </Card>
+        </Container>
+    );
+};
 
 export default InstituteAdmin;
