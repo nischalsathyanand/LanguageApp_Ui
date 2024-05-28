@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   Grid,
-  GridRow,
-  GridColumn,
   Button,
   Header,
   Step,
@@ -13,15 +11,17 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownItem,
-  Container,
+  Loader
 } from 'semantic-ui-react';
 import { useLocation } from 'react-router-dom';
+import StudentContent from './StudentContent';
 
 const StudentHome = () => {
   const location = useLocation();
   const username = location.state?.username || 'Default Username';
   const [languages, setLanguages] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
+  const [loadingLanguages, setLoadingLanguages] = useState(true);
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -31,6 +31,8 @@ const StudentHome = () => {
         setLanguages(data);
       } catch (error) {
         console.error('Error fetching languages:', error);
+      } finally {
+        setLoadingLanguages(false);
       }
     };
 
@@ -44,65 +46,71 @@ const StudentHome = () => {
   return (
     <div>
       <Grid celled stackable style={{ minHeight: '100vh' }}>
-        <GridRow centered>
+        <Grid.Row centered>
           {/* Left Sidebar */}
-          <GridColumn width={3} computer={3} tablet={4} mobile={16}>
-            <div style={{ textAlign: 'center', padding: '2em 1em' }}>
-              <Header as='h1' style={{ color: '#FB9E05', marginBottom: '1em' }}>
-                LEARN APP
-              </Header>
-              <StepGroup vertical size='big' style={{ marginTop: '5em' }}>
-                <Step active>
-                  <Icon name='home' />
-                  <StepContent>
-                    <Step.Title>Home</Step.Title>
-                  </StepContent>
-                </Step>
-                <Step>
-                  <Icon name='winner' />
-                  <StepContent>
-                    <Step.Title>LeaderBoard</Step.Title>
-                  </StepContent>
-                </Step>
-              </StepGroup>
+          <Grid.Column width={3} computer={3} tablet={4} mobile={16}>
+            <div style={{ position: 'fixed', top: '0', left: '0', bottom: '0', width: 'inherit', textAlign: 'center', padding: '2em 1em', backgroundColor: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <Header as='h1' style={{ color: '#58CC02', marginBottom: '1em' }}>
+                  LEARN APP
+                </Header>
+                <StepGroup vertical size='big' style={{ marginTop: '5em' }}>
+                  <Step active>
+                    <Icon name='home' />
+                    <StepContent>
+                      <Step.Title>Home</Step.Title>
+                    </StepContent>
+                  </Step>
+                  <Step>
+                    <Icon name='winner' />
+                    <StepContent>
+                      <Step.Title>LeaderBoard</Step.Title>
+                    </StepContent>
+                  </Step>
+                </StepGroup>
+              </div>
               <Button
                 size='big'
                 style={{
-                  marginTop: '2em',
                   color: 'white',
                   fontWeight: 'bold',
-                  backgroundColor: '#FB9E05',
-                  border: '2px solid #FB9E05',
+                  backgroundColor: '#58CC02',
+                  border: '2px solid #58CC02',
                 }}
               >
                 LOGOUT
               </Button>
             </div>
-          </GridColumn>
+          </Grid.Column>
 
           {/* Main Content */}
-          <GridColumn width={13} computer={13} tablet={12} mobile={16} style={{ backgroundColor: '#f7f7f7' }}>
+          <Grid.Column width={13} computer={13} tablet={12} mobile={16} style={{ backgroundColor: '#f7f7f7' }}>
             <Menu
+              fixed='top'
               style={{
                 height: '80px',
-                backgroundColor: '#FB9E05',
+                backgroundColor: '#58CC02',
                 fontSize: '1.2rem',
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
                 padding: '0 1em',
+                zIndex: 1000,
               }}
             >
-              <Dropdown item text={selectedLanguage ? selectedLanguage.name : 'Languages'} size='large' style={{ color: 'white' }}>
-                <DropdownMenu style={{ fontSize: '1.2rem' }}>
-                  {languages.map((language) => (
-                    <DropdownItem key={language._id} onClick={() => handleLanguageChange(language)}>
-                      {language.name}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
-              {/* Display User Icon and Username */}
+              {loadingLanguages ? (
+                <Loader active inline='centered' size='small' />
+              ) : (
+                <Dropdown item text={selectedLanguage ? selectedLanguage.name : 'Languages'} size='large' style={{ color: 'white' }}>
+                  <DropdownMenu style={{ fontSize: '1.2rem' }}>
+                    {languages.map((language) => (
+                      <DropdownItem key={language._id} onClick={() => handleLanguageChange(language)}>
+                        {language.name}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
+              )}
               <Menu.Menu position='right' style={{ display: 'flex', alignItems: 'center' }}>
                 <Menu.Item style={{ display: 'flex', alignItems: 'center' }}>
                   <Icon name='user circle' size='large' style={{ marginRight: '0.5em', color: 'white' }} />
@@ -112,12 +120,11 @@ const StudentHome = () => {
                 </Menu.Item>
               </Menu.Menu>
             </Menu>
-            <Container style={{ marginTop: '2em', padding: '2em' }}>
-              {/* Replace with actual content */}
-              <p>This is where your content goes.</p>
-            </Container>
-          </GridColumn>
-        </GridRow>
+            <div style={{ marginTop: '80px' }}>
+              <StudentContent selectedLanguage={selectedLanguage} />
+            </div>
+          </Grid.Column>
+        </Grid.Row>
       </Grid>
     </div>
   );
