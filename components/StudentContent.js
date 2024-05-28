@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Header, Button, Loader, Icon, Popup, Modal } from 'semantic-ui-react';
-import QuestionComponent from './QuestionComponent'; // Adjust the import path as necessary
+import React, { useEffect, useState, useRef } from 'react';
+import { Container, Header, Button, Loader, Icon, Popup, Modal, Sticky } from 'semantic-ui-react';
+import QuestionComponent from './QuestionComponent';
+
+const colorPalette = ["#CE82FF","#00CD9C","#58CC02","#FF9600","#FF86D0","#1CB0F6"];
+
+const getRandomColor = () => colorPalette[Math.floor(Math.random() * colorPalette.length)];
 
 const StudentContent = ({ selectedLanguage }) => {
   const [chapters, setChapters] = useState([]);
@@ -8,6 +12,8 @@ const StudentContent = ({ selectedLanguage }) => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const contextRef = useRef();
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -46,7 +52,7 @@ const StudentContent = ({ selectedLanguage }) => {
     setModalOpen(true);
   };
 
-  const renderLessons = (lessons) => {
+  const renderLessons = (lessons, color) => {
     if (!lessons || lessons.length === 0) {
       return <p>No lessons found for this chapter.</p>;
     }
@@ -61,7 +67,7 @@ const StudentContent = ({ selectedLanguage }) => {
             closeOnTriggerMouseLeave={false}
             position='bottom center'
             content={(
-              <div style={{ backgroundColor: '#58CC02', padding: '2em', borderRadius: '10px', textAlign: 'center', width: '300px' }}>
+              <div style={{ backgroundColor: color, padding: '2em', borderRadius: '10px', textAlign: 'center', width: '300px' }}>
                 <div style={{ color: 'white', fontSize: '1.5em', fontWeight: 'bold', marginBottom: '1em' }}>
                   {lesson.name}
                 </div>
@@ -95,21 +101,28 @@ const StudentContent = ({ selectedLanguage }) => {
       {loading ? (
         <Loader active inline='centered' />
       ) : (
-        <div style={{ position: 'sticky', top: '5em', zIndex: 10 }}>
-          {chapters.map((chapter) => (
-            <div key={chapter._id} style={{ marginBottom: '2em' }}>
-              <Header as='h2' style={{ backgroundColor: '#CE82FF', color: 'white', margin: '0', padding: '1em' }}>
-                {chapter.name}
-              </Header>
-              {renderLessons(chapter.lessons)}
-            </div>
-          ))}
+        <div ref={contextRef}>
+          {chapters.map((chapter) => {
+            const chapterColor = getRandomColor();
+            return (
+              <div key={chapter._id} style={{ marginBottom: '2em' }}>
+                <Sticky context={contextRef} offset={100}>
+                  <div style={{ backgroundColor: chapterColor, padding: '1em', borderRadius: '10px' }}>
+                    <Header as='h1' style={{ color: 'white', margin: '0' }}>
+                      {chapter.name}
+                    </Header>
+                  </div>
+                </Sticky>
+                {renderLessons(chapter.lessons, chapterColor)}
+              </div>
+            );
+          })}
         </div>
       )}
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        style={{ 
+        style={{
           position: 'fixed',
           top: 0,
           left: 0,
@@ -121,11 +134,11 @@ const StudentContent = ({ selectedLanguage }) => {
       >
         <Modal.Header>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Icon 
+            <Icon
               size='large'
-              name='close' 
-              style={{ cursor: 'pointer' }} 
-              onClick={() => setModalOpen(false)} 
+              name='close'
+              style={{ cursor: 'pointer' }}
+              onClick={() => setModalOpen(false)}
             />
           </div>
         </Modal.Header>
