@@ -9,7 +9,7 @@ import { questionSessionStore } from '../store/questionSessionStore'; // Import 
 
 const TrainingAndAssessmentContainer = observer(() => {
   const { questions, selectedLesson } = questionSessionStore;
-  const PART_SIZE = 2;
+  const PART_SIZE = 4;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTraining, setIsTraining] = useState(true);
   const [progressPercent, setProgressPercent] = useState(0);

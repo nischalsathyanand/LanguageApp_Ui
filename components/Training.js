@@ -48,6 +48,11 @@ const Training = observer(({ handleNext }) => {
     return `http://localhost:3000/aws/data/${imagePath}right/${fileName}`;
   };
 
+  const getAudioUrl = (audioPath) => {
+    const fileName = audioPath.split('/').slice(-2, -1)[0] + '.mp3';
+    return `http://localhost:3000/aws/data/${audioPath}${fileName}`;
+  };
+
   return (
     <Container textAlign="center" style={{ padding: '40px' }}>
       {questions.length > 0 && currentIndex < questions.length && (
@@ -67,7 +72,7 @@ const Training = observer(({ handleNext }) => {
           <Button size="huge" onClick={handleTrainingNext} primary style={{ padding: '15px 30px' }}>
             {buttonText}
           </Button>
-          <audio id="trainingAudio" src={`http://localhost:3000/aws/data/${questions[currentIndex].audio1}`} autoPlay />
+          <audio id="trainingAudio" src={getAudioUrl(questions[currentIndex].audio1)} autoPlay />
         </div>
       )}
       {questions.length === 0 && <Message>No training material available.</Message>}
