@@ -1,0 +1,89 @@
+import React, { useState, useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
+import { Header, Progress, Container, Button, Icon } from 'semantic-ui-react';
+import { useNavigate } from "react-router-dom";
+import Confetti from 'react-confetti';
+import Training from './Training';
+import Assessment from './Assessment';
+import { questionSessionStore } from '../store/questionSessionStore'; // Import the MobX store
+
+const TrainingAndAssessmentContainer = observer(() => {
+  const { questions, selectedLesson } = questionSessionStore;
+  const PART_SIZE = 2;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTraining, setIsTraining] = useState(true);
+  const [progressPercent, setProgressPercent] = useState(0);
+  const [timer, setTimer] = useState(0);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setProgressPercent((currentIndex / questions.length) * 100);
+  }, [currentIndex, questions.length]);
+
+  useEffect(() => {
+    const timerInterval = setInterval(() => {
+      setTimer(prevTimer => prevTimer + 1);
+    }, 1000);
+    
+    return () => clearInterval(timerInterval);
+  }, []);
+
+  const handleNext = () => {
+    setIsTraining(!isTraining);
+    if (!isTraining) {
+      if (currentIndex + PART_SIZE < questions.length) {
+        setCurrentIndex(currentIndex + PART_SIZE);
+        setProgressPercent(((currentIndex + PART_SIZE) / questions.length) * 100);
+      } else {
+        setCurrentIndex(0);
+        setProgressPercent(100);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (progressPercent === 100) {
+      setTimeout(() => {
+        navigate("/home");
+      }, 4000);
+    }
+  }, [progressPercent, navigate]);
+
+  const currentPart = questions.slice(currentIndex, currentIndex + PART_SIZE);
+
+
+  if (!selectedLesson) {
+    return <div>Please select a lesson to start.</div>;
+  }
+
+  return (
+    <Container>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+        <div>
+          <Icon name='heart' color='red' />
+          <span style={{ marginLeft: '5px' }}>Score: {currentIndex} / {questions.length}</span>
+        </div>
+        <div>
+          <Icon name='clock' />
+          <span style={{ marginLeft: '5px' }}>Time: {timer} seconds</span>
+        </div>
+      </div>
+      <Progress percent={progressPercent} indicating />
+      {progressPercent < 100 ? (
+        isTraining ? (
+          <Training questions={currentPart} handleNext={handleNext} />
+        ) : (
+          <Assessment questions={currentPart} handleNext={handleNext} />
+        )
+      ) : (
+        <div>
+          <Header as="h2">Congratulations! You have completed all parts.</Header>
+          <Confetti />
+        </div>
+      )}
+    </Container>
+  );
+});
+
+export default TrainingAndAssessmentContainer;

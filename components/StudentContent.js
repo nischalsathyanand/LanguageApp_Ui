@@ -1,18 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Container, Header, Button, Loader, Icon, Popup, Modal, Sticky } from 'semantic-ui-react';
-import QuestionComponent from './QuestionComponent';
+import { Container, Header, Button, Loader, Icon, Popup, Modal, Sticky, Message } from 'semantic-ui-react';
+import { observer } from 'mobx-react-lite';
+import { questionSessionStore } from '../store/questionSessionStore'; // Import the MobX store
+import TrainingAndAssessmentContainer from './TrainingAndAssessmentContainer';
 
-const colorPalette = ["#CE82FF","#00CD9C","#58CC02","#FF9600","#FF86D0","#1CB0F6"];
+const colorPalette = ["#CE82FF", "#00CD9C", "#58CC02", "#FF9600", "#FF86D0", "#1CB0F6"];
 
 const getRandomColor = () => colorPalette[Math.floor(Math.random() * colorPalette.length)];
 
-const StudentContent = ({ selectedLanguage }) => {
+const StudentContent = observer(({ selectedLanguage }) => {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
   const contextRef = useRef();
 
   useEffect(() => {
@@ -20,13 +22,15 @@ const StudentContent = ({ selectedLanguage }) => {
       if (!selectedLanguage) return;
 
       setLoading(true);
+      setError(null);
       try {
         const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage._id}/chapters`);
+        if (!response.ok) throw new Error('Failed to fetch chapters');
         const data = await response.json();
-        
-        // Fetch lessons for each chapter
+
         const chaptersWithLessons = await Promise.all(data.map(async (chapter) => {
           const lessonsResponse = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage._id}/chapters/${chapter._id}/lessons`);
+          if (!lessonsResponse.ok) throw new Error('Failed to fetch lessons');
           const lessons = await lessonsResponse.json();
           return { ...chapter, lessons };
         }));
@@ -34,6 +38,7 @@ const StudentContent = ({ selectedLanguage }) => {
         setChapters(chaptersWithLessons);
       } catch (error) {
         console.error('Error fetching chapters:', error);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -42,17 +47,32 @@ const StudentContent = ({ selectedLanguage }) => {
     fetchChapters();
   }, [selectedLanguage]);
 
-  const handleLessonClick = (lesson) => {
-    setSelectedLesson(lesson);
+  const handleLessonClick = (lesson, chapterId) => {
+    setSelectedLesson({ ...lesson, chapterId }); // Set the chapterId in the selectedLesson
     setPopupOpen(true);
   };
 
-  const handleStartClick = () => {
-    setPopupOpen(false);
-    setModalOpen(true);
+  const handleStartClick = async () => {
+    if (selectedLesson) {
+      setLoading(true);
+      setPopupOpen(false);
+      try {
+        const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage._id}/chapters/${selectedLesson.chapterId}/lessons/${selectedLesson._id}/questions`);
+        if (!response.ok) throw new Error('Failed to fetch questions');
+        const questions = await response.json();
+        questionSessionStore.setQuestions(questions);
+        questionSessionStore.setSelectedLesson(selectedLesson);
+        setModalOpen(true);
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
-  const renderLessons = (lessons, color) => {
+  const renderLessons = (lessons, chapterId, color) => {
     if (!lessons || lessons.length === 0) {
       return <p>No lessons found for this chapter.</p>;
     }
@@ -83,9 +103,8 @@ const StudentContent = ({ selectedLanguage }) => {
             trigger={
               <Button 
                 circular 
-                color='orange' 
-                style={{ margin: '0.5em', width: '60px', height: '60px', backgroundColor: 'transparent', border: 'none' }}
-                onClick={() => handleLessonClick(lesson)}
+                style={{ margin: '0.5em', width: '60px', height: '60px', backgroundColor: color, border: 'none' }}
+                onClick={() => handleLessonClick(lesson, chapterId)}
               >
                 <Icon name='star' />
               </Button>
@@ -100,6 +119,11 @@ const StudentContent = ({ selectedLanguage }) => {
     <Container style={{ marginTop: '2em', padding: '2em' }}>
       {loading ? (
         <Loader active inline='centered' />
+      ) : error ? (
+        <Message negative>
+          <Message.Header>Error</Message.Header>
+          <p>{error}</p>
+        </Message>
       ) : (
         <div ref={contextRef}>
           {chapters.map((chapter) => {
@@ -113,7 +137,7 @@ const StudentContent = ({ selectedLanguage }) => {
                     </Header>
                   </div>
                 </Sticky>
-                {renderLessons(chapter.lessons, chapterColor)}
+                {renderLessons(chapter.lessons, chapter._id, chapterColor)}
               </div>
             );
           })}
@@ -143,11 +167,11 @@ const StudentContent = ({ selectedLanguage }) => {
           </div>
         </Modal.Header>
         <Modal.Content>
-          <QuestionComponent />
+          <TrainingAndAssessmentContainer />
         </Modal.Content>
       </Modal>
     </Container>
   );
-};
+});
 
 export default StudentContent;
