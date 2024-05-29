@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Container, Header, Image, Button, Card, Transition, Message, Icon } from 'semantic-ui-react';
+import { Container, Header, Image, Button, Card, Transition, Message } from 'semantic-ui-react';
 import { questionSessionStore } from '../store/questionSessionStore'; // Import the MobX store
 
 const Training = observer(({ handleNext }) => {
   const { questions } = questionSessionStore;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [audioPlaying, setAudioPlaying] = useState(false);
+  const [buttonText, setButtonText] = useState('START');
 
   const handleTrainingNext = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      setButtonText('CONTINUE');
     } else {
       handleNext();
     }
@@ -41,25 +43,31 @@ const Training = observer(({ handleNext }) => {
     }
   }, [audioPlaying]);
 
+  const getImageUrl = (imagePath) => {
+    const fileName = imagePath.split('/').slice(-2, -1)[0] + '.jpg';
+    return `http://localhost:3000/aws/data/${imagePath}right/${fileName}`;
+  };
+
   return (
-    <Container textAlign="center">
+    <Container textAlign="center" style={{ padding: '40px' }}>
       {questions.length > 0 && currentIndex < questions.length && (
-        <div>
-          <Header style={{ textTransform: 'uppercase' }}>
+        <div style={{ margin: '0 auto', maxWidth: '600px' }}>
+          <Header as="h1" style={{ marginBottom: '30px', fontSize: '2.5em', color: '#333' }}>
             {questions[currentIndex].text}
-            {questions[currentIndex].image1}
-        
           </Header>
-          <Card centered>
-            <Transition animation='drop' duration='500' visible={true}>
-              <Image bordered src={`http://localhost:3000/aws/data/${questions[currentIndex].image1}`} />
+          <Card centered style={{ width: '350px', height: '350px', margin: '0 auto', marginBottom: '30px' }}>
+            <Transition animation="fade" duration={500} visible={true}>
+              <Image src={getImageUrl(questions[currentIndex].image1)} style={{ height: '100%', objectFit: 'cover' }} />
             </Transition>
           </Card>
-          <audio id="trainingAudio" src={`http://localhost:3000/aws/data/${questions[currentIndex].audio1}`} autoPlay />
-          <Button circular icon={audioPlaying ? 'pause' : 'play'} onClick={handlePlayAudio} primary style={{ margin: '1em', fontSize: '2em' }} />
-          <div>
-            <Button size="huge" onClick={handleTrainingNext} primary>Next</Button>
+          <div style={{ margin: '30px 0' }}>
+            <Button circular icon={audioPlaying ? 'pause' : 'play'} onClick={handlePlayAudio} primary size='large' />
+            <Button circular icon='refresh' onClick={() => setAudioPlaying(false)} primary size='large' style={{ marginLeft: '15px' }} />
           </div>
+          <Button size="huge" onClick={handleTrainingNext} primary style={{ padding: '15px 30px' }}>
+            {buttonText}
+          </Button>
+          <audio id="trainingAudio" src={`http://localhost:3000/aws/data/${questions[currentIndex].audio1}`} autoPlay />
         </div>
       )}
       {questions.length === 0 && <Message>No training material available.</Message>}

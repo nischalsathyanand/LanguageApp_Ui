@@ -58,18 +58,18 @@ const TrainingAndAssessmentContainer = observer(() => {
   }
 
   return (
-    <Container>
+    <Container style={{ background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
         <div>
           <Icon name='heart' color='red' />
-          <span style={{ marginLeft: '5px' }}>Score: {currentIndex} / {questions.length}</span>
+          <span style={{ marginLeft: '5px', fontWeight: 'bold', fontSize: '20px' }}>Score: {currentIndex} / {questions.length}</span>
         </div>
         <div>
           <Icon name='clock' />
-          <span style={{ marginLeft: '5px' }}>Time: {timer} seconds</span>
+          <span style={{ marginLeft: '5px', fontWeight: 'bold', fontSize: '20px' }}>Time: {timer} seconds</span>
         </div>
       </div>
-      <Progress percent={progressPercent} indicating />
+      <Progress percent={progressPercent} color='teal' style={{ marginBottom: '20px' }} />
       {progressPercent < 100 ? (
         isTraining ? (
           <Training questions={currentPart} handleNext={handleNext} />
@@ -77,8 +77,8 @@ const TrainingAndAssessmentContainer = observer(() => {
           <Assessment questions={currentPart} handleNext={handleNext} />
         )
       ) : (
-        <div>
-          <Header as="h2">Congratulations! You have completed all parts.</Header>
+        <div style={{ textAlign: 'center' }}>
+          <Header as="h2" style={{ color: '#21ba45', marginBottom: '20px' }}>Congratulations! You have completed all parts.</Header>
           <Confetti />
         </div>
       )}

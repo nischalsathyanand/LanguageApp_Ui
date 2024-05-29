@@ -4,9 +4,16 @@ import { observer } from 'mobx-react-lite';
 import { questionSessionStore } from '../store/questionSessionStore'; // Import the MobX store
 import TrainingAndAssessmentContainer from './TrainingAndAssessmentContainer';
 
-const colorPalette = ["#CE82FF", "#00CD9C", "#58CC02", "#FF9600", "#FF86D0", "#1CB0F6"];
+const colorPalette = {
+  0: "#58CC02",
+  1: "#00CD9C",
+  2: "#1CB0F6",
+  3: "#FF9600",
+  4: "#FF86D0",
+  5: "#CE82FF"
+};
 
-const getRandomColor = () => colorPalette[Math.floor(Math.random() * colorPalette.length)];
+const getColorForChapter = (index) => colorPalette[index % Object.keys(colorPalette).length];
 
 const StudentContent = observer(({ selectedLanguage }) => {
   const [chapters, setChapters] = useState([]);
@@ -48,7 +55,7 @@ const StudentContent = observer(({ selectedLanguage }) => {
   }, [selectedLanguage]);
 
   const handleLessonClick = (lesson, chapterId) => {
-    setSelectedLesson({ ...lesson, chapterId }); // Set the chapterId in the selectedLesson
+    setSelectedLesson({ ...lesson, chapterId });
     setPopupOpen(true);
   };
 
@@ -74,7 +81,7 @@ const StudentContent = observer(({ selectedLanguage }) => {
 
   const renderLessons = (lessons, chapterId, color) => {
     if (!lessons || lessons.length === 0) {
-      return <p>No lessons found for this chapter.</p>;
+      return <p style={{ color: '#999' }}>No lessons found for this chapter.</p>;
     }
 
     return (
@@ -103,10 +110,10 @@ const StudentContent = observer(({ selectedLanguage }) => {
             trigger={
               <Button 
                 circular 
-                style={{ margin: '0.5em', width: '60px', height: '60px', backgroundColor: color, border: 'none' }}
+                style={{ margin: '0.5em', width: '60px', height: '60px', backgroundColor: color, border: 'none', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' }}
                 onClick={() => handleLessonClick(lesson, chapterId)}
               >
-                <Icon name='star' />
+                <Icon name='star' style={{ color: 'white' }} />
               </Button>
             }
           />
@@ -126,13 +133,13 @@ const StudentContent = observer(({ selectedLanguage }) => {
         </Message>
       ) : (
         <div ref={contextRef}>
-          {chapters.map((chapter) => {
-            const chapterColor = getRandomColor();
+          {chapters.map((chapter, index) => {
+            const chapterColor = getColorForChapter(index);
             return (
               <div key={chapter._id} style={{ marginBottom: '2em' }}>
                 <Sticky context={contextRef} offset={100}>
-                  <div style={{ backgroundColor: chapterColor, padding: '1em', borderRadius: '10px' }}>
-                    <Header as='h1' style={{ color: 'white', margin: '0' }}>
+                  <div style={{ backgroundColor: chapterColor, padding: '1em', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' }}>
+                    <Header as='h1' style={{ color: 'white', margin: '0', textAlign: 'center', padding: '0.5em 0' }}>
                       {chapter.name}
                     </Header>
                   </div>
