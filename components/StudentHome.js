@@ -15,6 +15,7 @@ import {
 } from 'semantic-ui-react';
 import { useLocation } from 'react-router-dom';
 import StudentContent from './StudentContent';
+import { useNavigate } from 'react-router-dom';
 
 const StudentHome = () => {
   const location = useLocation();
@@ -22,6 +23,7 @@ const StudentHome = () => {
   const [languages, setLanguages] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [loadingLanguages, setLoadingLanguages] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -42,7 +44,10 @@ const StudentHome = () => {
   const handleLanguageChange = (language) => {
     setSelectedLanguage(language);
   };
-
+ const handleLogout = ()=>
+ {
+navigate("/login")
+ }
   return (
     <div>
       <Grid celled stackable style={{ minHeight: '100vh' }}>
@@ -77,6 +82,7 @@ const StudentHome = () => {
                   backgroundColor: '#58CC02',
                   border: '2px solid #58CC02',
                 }}
+                onClick={handleLogout}
               >
                 LOGOUT
               </Button>

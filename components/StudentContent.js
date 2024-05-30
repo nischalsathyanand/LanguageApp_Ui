@@ -86,7 +86,7 @@ const StudentContent = observer(({ selectedLanguage }) => {
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '1em' }}>
-        {lessons.map((lesson,index) => (
+        {lessons.map((lesson) => (
           <Popup
             key={lesson._id}
             open={popupOpen && selectedLesson?._id === lesson._id}

@@ -1,3 +1,4 @@
+// Training.js
 import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Container, Header, Image, Button, Card, Transition, Message } from 'semantic-ui-react';
