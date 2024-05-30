@@ -8,41 +8,14 @@ import Assessment from './Assessment';
 import { questionSessionStore } from '../store/questionSessionStore'; // Import the MobX store
 
 const TrainingAndAssessmentContainer = observer(() => {
-  const { selectedLesson } = questionSessionStore;
+  const { questions, selectedLesson } = questionSessionStore;
   const PART_SIZE = 4;
-  const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTraining, setIsTraining] = useState(true);
   const [progressPercent, setProgressPercent] = useState(0);
   const [timer, setTimer] = useState(0);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/v1/generate-questions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ questions: questionSessionStore.questions })
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch questions');
-        }
-
-        const data = await response.json();
-      
-        setQuestions(data);
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-      }
-    };
-
-    fetchQuestions();
-  }, []);
 
   useEffect(() => {
     setProgressPercent((currentIndex / questions.length) * 100);
@@ -52,7 +25,7 @@ const TrainingAndAssessmentContainer = observer(() => {
     const timerInterval = setInterval(() => {
       setTimer(prevTimer => prevTimer + 1);
     }, 1000);
-
+    
     return () => clearInterval(timerInterval);
   }, []);
 

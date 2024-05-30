@@ -1,11 +1,8 @@
-// Training.js
 import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Container, Header, Image, Button, Card, Transition, Message } from 'semantic-ui-react';
-import { questionSessionStore } from '../store/questionSessionStore'; // Import the MobX store
 
-const Training = observer(({ handleNext }) => {
-  const { questions } = questionSessionStore;
+const Training = observer(({ questions, handleNext }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [buttonText, setButtonText] = useState('START');
