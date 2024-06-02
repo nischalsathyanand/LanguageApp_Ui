@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Header, Progress, Container, Button, Icon } from 'semantic-ui-react';
-import { useNavigate } from "react-router-dom";
+import { Header, Container, Button, Icon } from 'semantic-ui-react';
+import { useNavigate } from 'react-router-dom';
 import Confetti from 'react-confetti';
 import Training from './Training';
 import Assessment from './Assessment';
@@ -12,45 +12,66 @@ const TrainingAndAssessmentContainer = observer(() => {
   const PART_SIZE = 4;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTraining, setIsTraining] = useState(true);
-  const [progressPercent, setProgressPercent] = useState(0);
-  const [timer, setTimer] = useState(0);
+  const [partIndex, setPartIndex] = useState(0);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
+  const [timeElapsed, setTimeElapsed] = useState(0); // Total elapsed time in seconds
+  const [timerInterval, setTimerInterval] = useState(null); // Interval ID for the timer
+  const [score, setScore] = useState(0); // Score tracker
 
   const navigate = useNavigate();
 
+  // Start the timer when the lesson starts
   useEffect(() => {
-    setProgressPercent((currentIndex / questions.length) * 100);
-  }, [currentIndex, questions.length]);
+    setStartTime(new Date());
 
-  useEffect(() => {
-    const timerInterval = setInterval(() => {
-      setTimer(prevTimer => prevTimer + 1);
+    // Update the elapsed time every second
+    const intervalId = setInterval(() => {
+      setTimeElapsed((prevTimeElapsed) => prevTimeElapsed + 1);
     }, 1000);
-    
-    return () => clearInterval(timerInterval);
+
+    setTimerInterval(intervalId);
+
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   const handleNext = () => {
-    setIsTraining(!isTraining);
-    if (!isTraining) {
-      if (currentIndex + PART_SIZE < questions.length) {
-        setCurrentIndex(currentIndex + PART_SIZE);
-        setProgressPercent(((currentIndex + PART_SIZE) / questions.length) * 100);
+    if (isTraining) {
+      setIsTraining(false);
+    } else {
+      const nextIndex = currentIndex + PART_SIZE;
+      if (nextIndex >= questions.length) {
+        setEndTime(new Date());
+        setPartIndex(partIndex + 1);
       } else {
-        setCurrentIndex(0);
-        setProgressPercent(100);
+        setCurrentIndex(nextIndex);
+        setIsTraining(true);
       }
     }
   };
 
   useEffect(() => {
-    if (progressPercent === 100) {
+    if (partIndex * PART_SIZE >= questions.length) {
+      clearInterval(timerInterval); // Stop the timer
       setTimeout(() => {
-        navigate("/home");
+        navigate('/home');
       }, 4000);
     }
-  }, [progressPercent, navigate]);
+  }, [partIndex, questions.length, navigate, timerInterval]);
 
   const currentPart = questions.slice(currentIndex, currentIndex + PART_SIZE);
+
+  // Calculate the score based on completed assessments
+  const calculateScore = () => {
+    let totalScore = 0;
+    for (let i = 0; i < partIndex; i++) {
+      totalScore += PART_SIZE;
+    }
+    totalScore += currentIndex;
+    return totalScore;
+  };
 
   if (!selectedLesson) {
     return <div>Please select a lesson to start.</div>;
@@ -61,23 +82,31 @@ const TrainingAndAssessmentContainer = observer(() => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
         <div>
           <Icon name='heart' color='red' />
-          <span style={{ marginLeft: '5px', fontWeight: 'bold', fontSize: '20px' }}>Score: {currentIndex} / {questions.length}</span>
+          <span style={{ marginLeft: '5px', fontWeight: 'bold', fontSize: '20px' }}>Score: {score} / {questions.length}</span>
         </div>
         <div>
           <Icon name='clock' />
-          <span style={{ marginLeft: '5px', fontWeight: 'bold', fontSize: '20px' }}>Time: {timer} seconds</span>
+          <span style={{ marginLeft: '5px', fontWeight: 'bold', fontSize: '20px' }}>Time: {timeElapsed} seconds</span>
         </div>
       </div>
-      <Progress percent={progressPercent} color='teal' style={{ marginBottom: '20px' }} />
-      {progressPercent < 100 ? (
+      {partIndex * PART_SIZE < questions.length ? (
         isTraining ? (
           <Training questions={currentPart} handleNext={handleNext} />
         ) : (
-          <Assessment questions={currentPart} handleNext={handleNext} />
+          <Assessment
+            questions={currentPart}
+            handleNext={handleNext}
+            onAssessmentComplete={() => {
+              setScore(calculateScore());
+              handleNext();
+            }}
+          />
         )
       ) : (
         <div style={{ textAlign: 'center' }}>
           <Header as="h2" style={{ color: '#21ba45', marginBottom: '20px' }}>Congratulations! You have completed all parts.</Header>
+          <p>Completed Time: {timeElapsed} seconds</p>
+          <p>Score: {score} / {questions.length}</p>
           <Confetti />
         </div>
       )}
