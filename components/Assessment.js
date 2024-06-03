@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { observer } from 'mobx-react-lite';
-import { Container, Header, Segment, Image, Grid, Button } from 'semantic-ui-react';
-import FeedbackComponent from './FeedbackComponent';
+import React, { useState, useEffect } from "react";
+import { observer } from "mobx-react-lite";
+import { Container, Header, Card, Image, Grid, Button, Icon } from "semantic-ui-react";
+import correctSound from "../sounds/correct.mp3";
+import wrongSound from "../sounds/wrong.mp3";
 
 const shuffleArray = (array) => {
   return array.sort(() => Math.random() - 0.5);
@@ -10,47 +11,58 @@ const shuffleArray = (array) => {
 const Assessment = observer(({ questions, onAssessmentComplete }) => {
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [feedbackMessage, setFeedbackMessage] = useState('');
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const [feedback, setFeedback] = useState(null);
 
   const handleImageClick = (correct) => {
-    setIsCorrect(correct);
     if (correct) {
-      setFeedbackMessage('Correct answer!');
+      new Audio(correctSound).play();
+      setFeedback({ message: "Correct!", correct: true });
     } else {
-      setFeedbackMessage('Incorrect answer. Try again.');
+      new Audio(wrongSound).play();
+      setFeedback({ message: "You are wrong! Try again", correct: false });
+    }
+  };
+
+  const handleContinue = () => {
+    if (feedback.correct) {
+      setFeedback(null);
+      if (currentIndex < generatedQuestions.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      } else {
+        onAssessmentComplete();
+      }
+    } else {
+      // Shuffle options again if the answer was incorrect
       const updatedQuestions = [...generatedQuestions];
       updatedQuestions[currentIndex].options = shuffleArray(updatedQuestions[currentIndex].options);
       setGeneratedQuestions(updatedQuestions);
+      setFeedback(null);
     }
-    setShowFeedback(true);
   };
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return '';
-    const fileName = imagePath.split('/').slice(-2, -1)[0] + '.jpg'; // Adjusted to get the last part of the path
+    if (!imagePath) return "";
+    const fileName = imagePath.split("/").slice(-2, -1)[0] + ".jpg";
     return `http://localhost:3000/aws/data/${imagePath}right/${fileName}`;
   };
 
   const getAudioUrl = (audioPath) => {
-    if (!audioPath) return '';
-    const fileName = audioPath.split('/').slice(-2, -1)[0] + '.mp3'; // Adjusted to get the last part of the path
+    if (!audioPath) return "";
+    const fileName = audioPath.split("/").slice(-2, -1)[0] + ".mp3";
     return `http://localhost:3000/aws/data/${audioPath}${fileName}`;
   };
 
   useEffect(() => {
     const fetchGeneratedQuestions = async () => {
       try {
-        const response = await fetch('http://localhost:3000/v1/generate-questions', {
-          method: 'POST',
+        const response = await fetch("http://localhost:3000/v1/generate-questions", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ questions }),
         });
         const data = await response.json();
-        console.log(data); // Log data here to check it once
 
         // Shuffle options for each question
         const shuffledQuestions = data.map((question) => ({
@@ -60,7 +72,7 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
 
         setGeneratedQuestions(shuffledQuestions);
       } catch (error) {
-        console.error('Error fetching generated questions:', error);
+        console.error("Error fetching generated questions:", error);
       }
     };
 
@@ -68,54 +80,87 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
     fetchGeneratedQuestions();
   }, []);
 
-  const handleNextQuestion = () => {
-    if (isCorrect) {
-      if (currentIndex < generatedQuestions.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-        setShowFeedback(false);
-        setFeedbackMessage('');
-      } else {
-        onAssessmentComplete(); // Call the onAssessmentComplete callback to update score or handle completion
+  useEffect(() => {
+    if (feedback && generatedQuestions.length > 0 && currentIndex < generatedQuestions.length) {
+      const audioUrl = getAudioUrl(generatedQuestions[currentIndex].audio1);
+      if (audioUrl) {
+        const audio = new Audio(audioUrl);
+        audio.play();
       }
-    } else {
-      setShowFeedback(false);
-      setFeedbackMessage('');
     }
-  };
+  }, [feedback]);
 
   return (
-    <Container textAlign="center" style={{ padding: '40px', background: '#f7f7f7', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length ? (
-        <Segment raised style={{ padding: '40px', borderRadius: '10px', width: '100%', maxWidth: '800px', textAlign: 'center', backgroundColor: '#fff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
-          <Header as="h1" style={{ marginBottom: '30px', fontSize: '2.5em', color: '#333' }}>
-            {generatedQuestions[currentIndex].text}
-          </Header>
-          <Grid columns={2} centered stackable style={{ marginBottom: '30px' }}>
+    <Container fluid style={{ padding: '0', margin: '0', height: 'auto', alignItems: 'center', justifyContent: 'center', background: '#fff' ,position:'relative'}}>
+      <div style={{ width: '100%',height:'auto' ,position:'relative',display:'flex',justifyContent:'center',alignItems:'center'}}>
+        <div style={{ maxWidth: '600px',height:'auto' ,position:'relative',}}>
+        <Header as="h1" textAlign="center" style={{ marginBottom: '20px', fontSize: '1.8em', color: '#333' }}>
+          {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length ? generatedQuestions[currentIndex].text : "No assessment material available."}
+        </Header>
+        {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
+          <Grid columns={2} centered stackable style={{ marginBottom: "20px" ,position:'relative',display:'flex',justifyContent:'center'}}>
             {generatedQuestions[currentIndex].options.map((option, idx) => (
-              <Grid.Column key={idx} style={{ padding: '10px' }}>
-                <Segment onClick={() => handleImageClick(option.correct)} style={{ cursor: 'pointer', padding: '0', borderRadius: '10px', overflow: 'hidden' }}>
-                  <Image src={getImageUrl(option.image)} style={{ width: '100%', height: '350px', objectFit: 'cover', borderRadius: '10px' }} />
-                </Segment>
+              <Grid.Column key={idx} style={{ padding: "10px", position:'relative' }}>
+                <Card
+                  onClick={() => handleImageClick(option.correct)}
+                  style={{
+                    cursor: "pointer",
+                    borderRadius: "10px",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                    width: '100%',
+                    height: '100%',
+                  }}
+                >
+                  <Image
+                    src={getImageUrl(option.image)}
+                    style={{
+                      height: '350px', // Set height to 350px
+                      objectFit: 'cover',
+                      borderRadius: "10px", // Match the card's border radius
+                    }}
+                  />
+                </Card>
               </Grid.Column>
             ))}
           </Grid>
-          {showFeedback && (
-            <Segment raised style={{ marginTop: '20px', borderRadius: '10px', textAlign: 'center', backgroundColor: '#fff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
-              <Header as="h3" style={{ marginBottom: '10px', fontSize: '1.5em', color: '#333' }}>
-                {feedbackMessage}
-              </Header>
-              <Button primary onClick={handleNextQuestion}>Next</Button>
-            </Segment>
-          )}
-          <audio id="assessmentAudio" src={getAudioUrl(generatedQuestions[currentIndex].audio1)} autoPlay />
-        </Segment>
-      ) : (
-        <Segment raised style={{ padding: '40px', borderRadius: '10px', maxWidth: '600px', textAlign: 'center', backgroundColor: '#fff', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
-          <Header as="h2" style={{ marginBottom: '30px', fontSize: '1.5em', color: '#333' }}>
-            No assessment material available.
-          </Header>
-        </Segment>
-      )}
+        }
+
+        </div>  
+   
+      </div>
+      {feedback &&
+        <div
+          style={{
+            minWidth: '100%',
+            padding: '20px',
+            backgroundColor: feedback.correct ? '#d4edda' : '#f8d7da',
+            color: feedback.correct ? '#155724' : '#721c24',
+            textAlign: 'center',
+            position: 'sticky', // This ensures the feedback message is immovable
+            bottom: '-3px',
+            left: '-20%',
+            zIndex: '1000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column'
+          }}
+        >
+          <Icon name={feedback.correct ? "check circle outline" : "times circle outline"} size="large" />
+          <div style={{ fontSize: '1.2em', marginBottom: '10px' }}>{feedback.message}</div>
+          <Button
+            color={feedback.correct ? "green" : "red"}
+            onClick={handleContinue}
+            style={{ width: '150px' }}
+          >
+            {currentIndex === generatedQuestions.length - 1 ? "Finish" : "Continue"}
+          </Button>
+        </div>
+      }
+      {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
+        <audio id="assessmentAudio" src={getAudioUrl(generatedQuestions[currentIndex].audio1)} autoPlay />
+      }
+     
     </Container>
   );
 });

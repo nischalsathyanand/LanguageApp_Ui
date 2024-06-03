@@ -5,9 +5,9 @@ import { questionSessionStore } from '../store/questionSessionStore'; // Import 
 import TrainingAndAssessmentContainer from './TrainingAndAssessmentContainer';
 
 const colorPalette = {
-  0: "#58CC02",
+  0: "#1CB0F6",
   1: "#00CD9C",
-  2: "#1CB0F6",
+  2: "#FF4B4B",
   3: "#FF9600",
   4: "#FF86D0",
   5: "#CE82FF"

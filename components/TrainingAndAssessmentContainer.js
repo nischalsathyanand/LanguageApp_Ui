@@ -50,13 +50,14 @@ const TrainingAndAssessmentContainer = observer(() => {
         setIsTraining(true);
       }
     }
+    setScore(calculateScore()); // Ensure score is updated correctly after each step
   };
 
   useEffect(() => {
     if (partIndex * PART_SIZE >= questions.length) {
       clearInterval(timerInterval); // Stop the timer
       setTimeout(() => {
-        navigate('/home');
+        navigate('/student');
       }, 4000);
     }
   }, [partIndex, questions.length, navigate, timerInterval]);
@@ -65,12 +66,8 @@ const TrainingAndAssessmentContainer = observer(() => {
 
   // Calculate the score based on completed assessments
   const calculateScore = () => {
-    let totalScore = 0;
-    for (let i = 0; i < partIndex; i++) {
-      totalScore += PART_SIZE;
-    }
-    totalScore += currentIndex;
-    return totalScore;
+    let completedQuestions = partIndex * PART_SIZE + currentIndex;
+    return Math.min(completedQuestions, questions.length); // Ensures the score doesn't exceed the total questions
   };
 
   if (!selectedLesson) {
@@ -78,7 +75,7 @@ const TrainingAndAssessmentContainer = observer(() => {
   }
 
   return (
-    <Container style={{ background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+    <Container style={{ background: '#fff', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', width: '100%', margin: 0 ,height:'auto',padding:'0px',margin:'0px'}}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
         <div>
           <Icon name='heart' color='red' />
@@ -89,6 +86,7 @@ const TrainingAndAssessmentContainer = observer(() => {
           <span style={{ marginLeft: '5px', fontWeight: 'bold', fontSize: '20px' }}>Time: {timeElapsed} seconds</span>
         </div>
       </div>
+      <div style={{position:'relative',objectFit:'cover',height:'auto',maxWidth:'100%',top:'30px',padding:'0px',margin:'20px'}}>
       {partIndex * PART_SIZE < questions.length ? (
         isTraining ? (
           <Training questions={currentPart} handleNext={handleNext} />
@@ -110,6 +108,8 @@ const TrainingAndAssessmentContainer = observer(() => {
           <Confetti />
         </div>
       )}
+      </div>
+     
     </Container>
   );
 });
