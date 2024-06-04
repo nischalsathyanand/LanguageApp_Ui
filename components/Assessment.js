@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { Container, Header, Card, Image, Grid, Button, Icon } from "semantic-ui-react";
 import correctSound from "../sounds/correct.mp3";
 import wrongSound from "../sounds/wrong.mp3";
+import { questionSessionStore } from "../store/questionSessionStore";
 
 const shuffleArray = (array) => {
   return array.sort(() => Math.random() - 0.5);
@@ -17,6 +18,7 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
     if (correct) {
       new Audio(correctSound).play();
       setFeedback({ message: "Correct!", correct: true });
+      questionSessionStore.incrementScore(); // Update the score in the store
     } else {
       new Audio(wrongSound).play();
       setFeedback({ message: "You are wrong! Try again", correct: false });
@@ -32,7 +34,6 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
         onAssessmentComplete();
       }
     } else {
-      // Shuffle options again if the answer was incorrect
       const updatedQuestions = [...generatedQuestions];
       updatedQuestions[currentIndex].options = shuffleArray(updatedQuestions[currentIndex].options);
       setGeneratedQuestions(updatedQuestions);
@@ -64,7 +65,6 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
         });
         const data = await response.json();
 
-        // Shuffle options for each question
         const shuffledQuestions = data.map((question) => ({
           ...question,
           options: shuffleArray(question.options),
@@ -76,7 +76,6 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
       }
     };
 
-    // Fetch data only once on component mount
     fetchGeneratedQuestions();
   }, []);
 
@@ -91,43 +90,42 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
   }, [feedback]);
 
   return (
-    <Container fluid style={{ padding: '0', margin: '0', height: 'auto', alignItems: 'center', justifyContent: 'center', background: '#fff' ,position:'relative'}}>
-      <div style={{ width: '100%',height:'auto' ,position:'relative',display:'flex',justifyContent:'center',alignItems:'center'}}>
-        <div style={{ maxWidth: '600px',height:'auto' ,position:'relative',}}>
-        <Header as="h1" textAlign="center" style={{ marginBottom: '20px', fontSize: '1.8em', color: '#333' }}>
-          {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length ? generatedQuestions[currentIndex].text : "No assessment material available."}
-        </Header>
-        {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
-          <Grid columns={2} centered stackable style={{ marginBottom: "20px" ,position:'relative',display:'flex',justifyContent:'center'}}>
-            {generatedQuestions[currentIndex].options.map((option, idx) => (
-              <Grid.Column key={idx} style={{ padding: "10px", position:'relative' }}>
-                <Card
-                  onClick={() => handleImageClick(option.correct)}
-                  style={{
-                    cursor: "pointer",
-                    borderRadius: "10px",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                    width: '100%',
-                    height: '100%',
-                  }}
-                >
-                  <Image
-                    src={getImageUrl(option.image)}
+    <Container fluid style={{ padding: '0', margin: '0', height: 'auto', alignItems: 'center', justifyContent: 'center', background: '#fff', position:'relative' }}>
+      <div style={{ width: '100%', height: 'auto', position:'relative', display:'flex', justifyContent:'center', alignItems:'center' }}>
+        <div style={{ maxWidth: '600px', height:'auto', position:'relative' }}>
+          <Header as="h1" textAlign="center" style={{ marginBottom: '20px', fontSize: '1.8em', color: '#333' }}>
+            {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length ? generatedQuestions[currentIndex].text : "No assessment material available."}
+          </Header>
+          {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
+            <Grid columns={2} centered stackable style={{ marginBottom: "20px", position:'relative', display:'flex', justifyContent:'center' }}>
+              {generatedQuestions[currentIndex].options.map((option, idx) => (
+                <Grid.Column key={idx} style={{ padding: "10px", position:'relative' }}>
+                  <Card
+                    onClick={() => handleImageClick(option.correct)}
                     style={{
-                      height: '350px', // Set height to 350px
-                      objectFit: 'cover',
-                      borderRadius: "10px", // Match the card's border radius
+                      cursor: "pointer",
+                      borderRadius: "10px",
+                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      width: '100%',
+                      height: '100%',
                     }}
-                  />
-                </Card>
-              </Grid.Column>
-            ))}
-          </Grid>
-        }
-
-        </div>  
-   
+                  >
+                    <Image
+                      src={getImageUrl(option.image)}
+                      style={{
+                        height: '350px',
+                        objectFit: 'cover',
+                        borderRadius: "10px",
+                      }}
+                    />
+                  </Card>
+                </Grid.Column>
+              ))}
+            </Grid>
+          }
+        </div>
       </div>
+      <div></div>
       {feedback &&
         <div
           style={{
@@ -136,9 +134,9 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
             backgroundColor: feedback.correct ? '#d4edda' : '#f8d7da',
             color: feedback.correct ? '#155724' : '#721c24',
             textAlign: 'center',
-            position: 'sticky', // This ensures the feedback message is immovable
+            position: 'sticky',
             bottom: '-3px',
-            left: '-20%',
+            left: '0',
             zIndex: '1000',
             display: 'flex',
             alignItems: 'center',
@@ -160,7 +158,6 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
       {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
         <audio id="assessmentAudio" src={getAudioUrl(generatedQuestions[currentIndex].audio1)} autoPlay />
       }
-     
     </Container>
   );
 });

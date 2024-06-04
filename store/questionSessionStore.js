@@ -1,9 +1,9 @@
-// QuestionSessionStore.js
 import { makeAutoObservable } from 'mobx';
 
 class QuestionSessionStore {
   questions = [];
   selectedLesson = null;
+  score = 0;
 
   constructor() {
     makeAutoObservable(this);
@@ -17,9 +17,14 @@ class QuestionSessionStore {
     this.selectedLesson = lesson;
   }
 
+  incrementScore() {
+    this.score += 1;
+  }
   clear() {
     this.questions = [];
     this.selectedLesson = null;
+    this.score = 0;
+    
   }
 }
 
