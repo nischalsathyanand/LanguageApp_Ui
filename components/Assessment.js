@@ -25,6 +25,14 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
     }
   };
 
+  const handlePlayAudio = () => {
+    const audioUrl = getAudioUrl(generatedQuestions[currentIndex].audio1);
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play();
+    }
+  };
+
   const handleContinue = () => {
     if (feedback.correct) {
       setFeedback(null);
@@ -79,23 +87,25 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
     fetchGeneratedQuestions();
   }, []);
 
+  // Auto play audio when currentIndex changes or new questions are generated
   useEffect(() => {
-    if (feedback && generatedQuestions.length > 0 && currentIndex < generatedQuestions.length) {
-      const audioUrl = getAudioUrl(generatedQuestions[currentIndex].audio1);
-      if (audioUrl) {
-        const audio = new Audio(audioUrl);
-        audio.play();
-      }
+    if (generatedQuestions.length > 0 && currentIndex < generatedQuestions.length) {
+      handlePlayAudio();
     }
-  }, [feedback]);
+  }, [currentIndex, generatedQuestions]);
 
   return (
     <Container fluid style={{ padding: '0', margin: '0', height: 'auto', alignItems: 'center', justifyContent: 'center', background: '#fff', position:'relative' }}>
       <div style={{ width: '100%', height: 'auto', position:'relative', display:'flex', justifyContent:'center', alignItems:'center' }}>
         <div style={{ maxWidth: '600px', height:'auto', position:'relative' }}>
-          <Header as="h1" textAlign="center" style={{ marginBottom: '20px', fontSize: '1.8em', color: '#333' }}>
-            {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length ? generatedQuestions[currentIndex].text : "No assessment material available."}
-          </Header>
+          {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+              <Header as="h1" textAlign="center" style={{ fontSize: '1.8em', color: '#333', margin: '0' }}>
+                {generatedQuestions[currentIndex].text}
+              </Header>
+              <Button icon='volume up' onClick={handlePlayAudio} style={{ marginLeft: '10px' }} />
+            </div>
+          }
           {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
             <Grid columns={2} centered stackable style={{ marginBottom: "20px", position:'relative', display:'flex', justifyContent:'center' }}>
               {generatedQuestions[currentIndex].options.map((option, idx) => (
@@ -106,14 +116,17 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
                       cursor: "pointer",
                       borderRadius: "10px",
                       boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                      width: '100%',
-                      height: '100%',
+                      width: '350px', // Fixed width
+                      height: '330px', // Fixed height
+                      border: '2px solid #d1d1d1', 
+                      overflow: 'hidden' 
                     }}
                   >
                     <Image
                       src={getImageUrl(option.image)}
                       style={{
-                        height: '350px',
+                        height: '100%',
+                        width: '100%',
                         objectFit: 'cover',
                         borderRadius: "10px",
                       }}
@@ -154,9 +167,6 @@ const Assessment = observer(({ questions, onAssessmentComplete }) => {
             {currentIndex === generatedQuestions.length - 1 ? "Finish" : "Continue"}
           </Button>
         </div>
-      }
-      {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
-        <audio id="assessmentAudio" src={getAudioUrl(generatedQuestions[currentIndex].audio1)} autoPlay />
       }
     </Container>
   );
