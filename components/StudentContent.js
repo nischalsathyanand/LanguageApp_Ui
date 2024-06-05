@@ -3,6 +3,7 @@ import { Container, Header, Button, Loader, Icon, Popup, Modal, Sticky, Message 
 import { observer } from 'mobx-react-lite';
 import { questionSessionStore } from '../store/questionSessionStore'; // Import the MobX store
 import TrainingAndAssessmentContainer from './TrainingAndAssessmentContainer';
+import 'semantic-ui-css/semantic.min.css';
 
 const colorPalette = {
   0: "#1CB0F6",
@@ -22,7 +23,10 @@ const StudentContent = observer(({ selectedLanguage }) => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [activeChapter, setActiveChapter] = useState(0);
   const contextRef = useRef();
+  const headersRef = useRef([]);
+  const stickyHeaderRef = useRef(null);
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -53,6 +57,23 @@ const StudentContent = observer(({ selectedLanguage }) => {
 
     fetchChapters();
   }, [selectedLanguage]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + (stickyHeaderRef.current?.offsetHeight || 0) + 20; // Added 20px offset for extra spacing
+      for (let i = 0; i < headersRef.current.length; i++) {
+        const headerTop = headersRef.current[i]?.getBoundingClientRect().top + window.scrollY - (stickyHeaderRef.current?.offsetHeight || 0);
+        const headerBottom = headersRef.current[i + 1]?.getBoundingClientRect().top + window.scrollY - (stickyHeaderRef.current?.offsetHeight || 0) || Number.POSITIVE_INFINITY;
+        if (scrollPosition >= headerTop && scrollPosition < headerBottom) {
+          setActiveChapter(i);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLessonClick = (lesson, chapterId) => {
     setSelectedLesson({ ...lesson, chapterId });
@@ -133,17 +154,49 @@ const StudentContent = observer(({ selectedLanguage }) => {
         </Message>
       ) : (
         <div ref={contextRef}>
+          <Sticky context={contextRef} offset={100}>
+            <div
+              ref={stickyHeaderRef}
+              style={{
+                backgroundColor: getColorForChapter(activeChapter),
+                padding: '1em',
+                borderRadius: '10px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '2em', // Adjusted for more space below the header
+                zIndex: 1000, // Ensure the sticky header stays on top
+              }}
+            >
+              <Icon name='arrow left' style={{ color: 'white', cursor: 'pointer' }} />
+              <Header
+                as='h1'
+                style={{ color: 'white', margin: '0', textAlign: 'center', padding: '0.5em 0' }}
+              >
+                {chapters[activeChapter]?.name}
+              </Header>
+              <Icon name='ellipsis vertical' style={{ color: 'white' }} />
+            </div>
+          </Sticky>
           {chapters.map((chapter, index) => {
             const chapterColor = getColorForChapter(index);
             return (
-              <div key={chapter._id} style={{ marginBottom: '2em' }}>
-                <Sticky context={contextRef} offset={100}>
-                  <div style={{ backgroundColor: chapterColor, padding: '1em', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' }}>
-                    <Header as='h1' style={{ color: 'white', margin: '0', textAlign: 'center', padding: '0.5em 0' }}>
-                      {chapter.name}
-                    </Header>
-                  </div>
-                </Sticky>
+              <div
+                key={chapter._id}
+                ref={(el) => (headersRef.current[index] = el)}
+                style={{ marginBottom: '3em' }} // Increased marginBottom between chapters for better spacing
+              >
+                {index === 0 ? null : (
+                  <div
+                    style={{
+                      height: '2px',
+                      backgroundColor: chapterColor,
+                      marginBottom: '2em', // Adjusted marginBottom for more space
+                      marginTop: '2em'    // Added marginTop for gap
+                    }}
+                  ></div>
+                )}
                 {renderLessons(chapter.lessons, chapter._id, chapterColor)}
               </div>
             );
@@ -171,10 +224,12 @@ const StudentContent = observer(({ selectedLanguage }) => {
               style={{ cursor: 'pointer' }}
               onClick={() => setModalOpen(false)}
             />
+           
+            <div></div>
           </div>
         </Modal.Header>
         <Modal.Content>
-          <TrainingAndAssessmentContainer />
+          <TrainingAndAssessmentContainer questionSessionStore={questionSessionStore} />
         </Modal.Content>
       </Modal>
     </Container>

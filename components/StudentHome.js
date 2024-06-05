@@ -13,10 +13,13 @@ import {
   DropdownItem,
   Loader,
   Flag,
+  Card,
 } from "semantic-ui-react";
 import { useLocation } from "react-router-dom";
 import StudentContent from "./StudentContent";
 import { useNavigate } from "react-router-dom";
+import { PiStudent } from "react-icons/pi";
+import StudentLanguageSelecter from "./StudentLanguageSelecter";
 
 const StudentHome = () => {
   const location = useLocation();
@@ -45,19 +48,23 @@ const StudentHome = () => {
   const handleLanguageChange = (language) => {
     setSelectedLanguage(language);
   };
+
   const handleLogout = () => {
     navigate("/login");
   };
+
   const languageCodeMap = {
     English: "us",
     Spanish: "es",
     French: "fr",
     German: "de",
-    Hindi:"in",
-    Italian:"it",
-    Japanese:"jp",
-    Mandarin:"tw",
-    Sanskrit:"in"
+    Hindi: "in",
+    Italian: "it",
+    Japanese: "jp",
+    Mandarin: "cn",
+    Sanskrit: "in",
+    Malayalam: "in",
+    Tamil: "in",
   };
 
   return (
@@ -126,48 +133,120 @@ const StudentHome = () => {
             mobile={16}
             style={{ backgroundColor: "#f7f7f7" }}
           >
-          <Menu
-  fixed='top'
-  style={{
-    height: '80px',
-    backgroundColor: '#58CC02', // Dark yellow background color
-    fontSize: '1.4rem', // Increased font size for the menu
-    color: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    padding: '0 1em',
-    zIndex: 1000,
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Adding shadow for elegance
-  }}
->
-  {loadingLanguages ? (
-    <Loader active inline='centered' size='small' />
-  ) : (
-    <Dropdown item text={selectedLanguage ? <Flag name={languageCodeMap[selectedLanguage.name]} style={{ marginRight: '5px', fontSize: '1.2rem' }} /> : 'Languages'} style={{ color: 'white', fontSize: '1.4rem' }}>
-      <DropdownMenu style={{ fontSize: '1.4rem' }}>
-        {languages.map((language) => (
-          <DropdownItem key={language._id} onClick={() => handleLanguageChange(language)} style={{ fontSize: '1.4rem' }}>
-            <Flag name={languageCodeMap[language.name]} style={{ marginRight: '5px', fontSize: '1.2rem' }} />{language.name}
-          </DropdownItem>
-        ))}
-      </DropdownMenu>
-    </Dropdown>
-  )}
-  <Menu.Menu position='right' style={{ display: 'flex', alignItems: 'center' }}>
-    <Menu.Item style={{ display: 'flex', alignItems: 'center', fontSize: '1.4rem' }}>
-      <Icon name='user circle' size='large' style={{ marginRight: '0.5em', color: 'white' }} />
-      <span style={{ fontSize: '1.4rem', color: 'white', display: 'flex', alignItems: 'center' }}>{username}</span>
-    </Menu.Item>
-  </Menu.Menu>
-</Menu>
-
+            <Menu
+              fixed="top"
+              style={{
+                height: "80px",
+                backgroundColor: "#58CC02", // Dark yellow background color
+                fontSize: "1.4rem", // Increased font size for the menu
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                padding: "0 1em",
+                zIndex: 1000,
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Adding shadow for elegance
+              }}
+            >
+              {loadingLanguages ? (
+                <Loader active inline="centered" size="small" />
+              ) : (
+                <Dropdown
+                  item
+                  text={
+                    selectedLanguage ? (
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <Flag
+                          name={languageCodeMap[selectedLanguage.name]}
+                          style={{ marginRight: "10px", fontSize: "2rem" }} // Updated font size to 2rem
+                        />
+                        <span style={{ fontSize: "1.4rem" }}>
+                          {selectedLanguage.name}
+                        </span>
+                      </div>
+                    ) : (
+                      "Languages"
+                    )
+                  }
+                  style={{ color: "white", fontSize: "1.4rem" }}
+                >
+                  <DropdownMenu style={{ fontSize: "1.4rem" }}>
+                    {languages.map((language) => (
+                      <DropdownItem
+                        key={language._id}
+                        onClick={() => handleLanguageChange(language)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          fontSize: "1.4rem",
+                          padding: "0.5em 1em",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                          <Flag
+                            name={languageCodeMap[language.name]}
+                            style={{ marginRight: "10px", fontSize: "2rem" }} // Updated font size to 2rem
+                          />
+                          {language.name}
+                        </div>
+                        <Icon
+                          name="unlock alternate"
+                          color="green"
+                          style={{ marginLeft: "5px" }}
+                        />
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
+              )}
+              <Menu.Menu
+                position="right"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <Menu.Item
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "1.4rem",
+                  }}
+                >
+                  <Icon
+                    name="user circle"
+                    size="large"
+                    style={{ marginRight: "0.5em", color: "white" }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "1.4rem",
+                      color: "white",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {username}
+                  </span>
+                </Menu.Item>
+              </Menu.Menu>
+            </Menu>
 
             <div style={{ marginTop: "80px" }}>
-              <StudentContent selectedLanguage={selectedLanguage} />
+              {selectedLanguage ? (
+                <StudentContent selectedLanguage={selectedLanguage} />
+              ) : (
+                <div>
+                <StudentLanguageSelecter
+                  languages={languages}
+                  languageCodeMap={languageCodeMap}
+                  handleLanguageChange={handleLanguageChange}
+                />
+              </div>
+              )}
             </div>
+           
           </Grid.Column>
         </Grid.Row>
-      </Grid>
+     
+        </Grid>
     </div>
   );
 };

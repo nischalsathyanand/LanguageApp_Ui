@@ -33,6 +33,7 @@ const LoginPage = () => {
       } else if (userInfo.role === 'student') {
         // Navigate to '/student' and pass username in the state
         navigate('/student', { state: { username: userInfo.username } });
+       
       }
     } catch (error) {
       setError(error.message);
