@@ -9,7 +9,8 @@ const shuffleArray = (array) => {
   return array.sort(() => Math.random() - 0.5);
 };
 
-const Assessment = observer(({ questions, handleNext }) => {
+const Assessment = observer(({ questions, handleNext, PART_SIZE,partIndex}) => {
+
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [feedback, setFeedback] = useState(null);
@@ -18,7 +19,8 @@ const Assessment = observer(({ questions, handleNext }) => {
     const sound = correct ? correctSound : wrongSound;
     const feedbackMessage = correct ? "Correct!" : "You are wrong! Try again";
     const feedbackCorrect = correct;
-    
+    console.log(currentIndex)
+    console.log(generatedQuestions)
     new Audio(sound).play();
     setFeedback({ message: feedbackMessage, correct: feedbackCorrect });
     
@@ -100,7 +102,7 @@ const Assessment = observer(({ questions, handleNext }) => {
     '0', height: 'auto', alignItems: 'center', justifyContent: 'center', background: '#fff', position:'relative' }}>
     <div style={{ width: '100%', height: 'auto', position:'relative', display:'flex', justifyContent:'center', alignItems:'center' }}>
       <div style={{ maxWidth: '600px', height:'auto', position:'relative' }}>
-        {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
+        {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&!(partIndex * PART_SIZE >= generatedQuestions.length) && 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
             <Header as="h1" textAlign="center" style={{ fontSize: '1.8em', color: '#333', margin: '0' }}>
               {generatedQuestions[currentIndex].text}
@@ -108,7 +110,7 @@ const Assessment = observer(({ questions, handleNext }) => {
             <Button icon='volume up' onClick={handlePlayAudio} style={{ marginLeft: '10px' }} />
           </div>
         }
-        {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&
+        {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length && !(partIndex * PART_SIZE >= generatedQuestions.length) && 
           <Grid columns={2} centered stackable style={{ marginBottom: "20px", position:'relative', display:'flex', justifyContent:'center' }}>
             {generatedQuestions[currentIndex].options.map((option, idx) => (
               <Grid.Column key={idx} style={{ padding: "10px", position:'relative' }}>
@@ -165,7 +167,8 @@ const Assessment = observer(({ questions, handleNext }) => {
           onClick={handleContinue}
           style={{ width: '150px' }}
         >
-          {currentIndex === generatedQuestions.length - 1 ? "Finish" : "Continue"}
+          {currentIndex === generatedQuestions.length - 1  ? "Finish" : "Continue"}
+          
         </Button>
       </div>
     }

@@ -128,7 +128,7 @@ const TrainingAndAssessmentContainer = observer(() => {
           isTraining ? (
             <Training questions={currentPart} handleNext={handleNext} />
           ) : (
-            <Assessment questions={currentPart} handleNext={handleNext} />
+            <Assessment questions={currentPart} handleNext={handleNext} PART_SIZE={PART_SIZE} partIndex={partIndex}  />
           )
         ) : (
           <div style={{ textAlign: "center" }}>
