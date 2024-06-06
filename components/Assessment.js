@@ -9,24 +9,24 @@ const shuffleArray = (array) => {
   return array.sort(() => Math.random() - 0.5);
 };
 
-const Assessment = observer(({ questions, handleNext, PART_SIZE,partIndex}) => {
-
+const Assessment = observer(({ questions, handleNext, isLastPart }) => {
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [feedback, setFeedback] = useState(null);
+  const [attempted, setAttempted] = useState(false); // New state to track if the question has been attempted
 
-  const handleImageClick = async (correct) => {
+  const handleImageClick = (correct) => {
     const sound = correct ? correctSound : wrongSound;
     const feedbackMessage = correct ? "Correct!" : "You are wrong! Try again";
     const feedbackCorrect = correct;
-    console.log(currentIndex)
-    console.log(generatedQuestions)
     new Audio(sound).play();
     setFeedback({ message: feedbackMessage, correct: feedbackCorrect });
-    
-    if (correct) {
-      questionSessionStore.incrementScore(); // Update the score in the store
+
+    if (correct && !attempted) {
+      questionSessionStore.incrementScore(); // Update the score in the store if the answer is correct on the first try
     }
+
+    setAttempted(true); // Set attempted to true after the first click
   };
 
   const handlePlayAudio = () => {
@@ -42,8 +42,9 @@ const Assessment = observer(({ questions, handleNext, PART_SIZE,partIndex}) => {
       setFeedback(null);
       if (currentIndex < generatedQuestions.length - 1) {
         setCurrentIndex(currentIndex + 1);
+        setAttempted(false); // Reset attempted for the next question
       } else {
-        handleNext(); // Call handleNext to proceed to the next step
+        handleNext(); // Call handleNext to proceed to the next step or show confetti
       }
     } else {
       const updatedQuestions = [...generatedQuestions];
@@ -98,82 +99,80 @@ const Assessment = observer(({ questions, handleNext, PART_SIZE,partIndex}) => {
   }, [currentIndex, generatedQuestions]);
 
   return (
-    <Container fluid style={{ padding: '0', margin:
-    '0', height: 'auto', alignItems: 'center', justifyContent: 'center', background: '#fff', position:'relative' }}>
-    <div style={{ width: '100%', height: 'auto', position:'relative', display:'flex', justifyContent:'center', alignItems:'center' }}>
-      <div style={{ maxWidth: '600px', height:'auto', position:'relative' }}>
-        {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length &&!(partIndex * PART_SIZE >= generatedQuestions.length) && 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-            <Header as="h1" textAlign="center" style={{ fontSize: '1.8em', color: '#333', margin: '0' }}>
-              {generatedQuestions[currentIndex].text}
-            </Header>
-            <Button icon='volume up' onClick={handlePlayAudio} style={{ marginLeft: '10px' }} />
-          </div>
-        }
-        {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length && !(partIndex * PART_SIZE >= generatedQuestions.length) && 
-          <Grid columns={2} centered stackable style={{ marginBottom: "20px", position:'relative', display:'flex', justifyContent:'center' }}>
-            {generatedQuestions[currentIndex].options.map((option, idx) => (
-              <Grid.Column key={idx} style={{ padding: "10px", position:'relative' }}>
-                <Card
-                  onClick={() => handleImageClick(option.correct)}
-                  style={{
-                    cursor: "pointer",
-                    borderRadius: "10px",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                    width: '350px', // Fixed width
-                    height: '330px', // Fixed height
-                    border: '2px solid #d1d1d1', 
-                    overflow: 'hidden' 
-                  }}
-                >
-                  <Image
-                    src={getImageUrl(option.image)}
-                    style={{
-                      height: '100%',
-                      width: '100%',
-                      objectFit: 'cover',
-                      borderRadius: "10px",
-                    }}
-                  />
-                </Card>
-              </Grid.Column>
-            ))}
-          </Grid>
-        }
+    <Container fluid style={{ padding: '0', margin: '0', height: 'auto', alignItems: 'center', justifyContent: 'center', background: '#fff', position: 'relative' }}>
+      <div style={{ width: '100%', height: 'auto', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ maxWidth: '600px', height: 'auto', position: 'relative' }}>
+          {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <Header as="h1" textAlign="center" style={{ fontSize: '1.8em', color: '#333', margin: '0' }}>
+                  {generatedQuestions[currentIndex].text}
+                </Header>
+                <Button icon='volume up' onClick={handlePlayAudio} style={{ marginLeft: '10px' }} />
+              </div>
+              <Grid columns={2} centered stackable style={{ marginBottom: "20px", position: 'relative', display: 'flex', justifyContent: 'center' }}>
+                {generatedQuestions[currentIndex].options.map((option, idx) => (
+                  <Grid.Column key={idx} style={{ padding: "10px", position: 'relative' }}>
+                    <Card
+                      onClick={() => handleImageClick(option.correct)}
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "10px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                        width: '350px',
+                        height: '330px',
+                        border: '2px solid #d1d1d1',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <Image
+                        src={getImageUrl(option.image)}
+                        style={{
+                          height: '100%',
+                          width: '100%',
+                          objectFit: 'cover',
+                          borderRadius: "10px",
+                        }}
+                      />
+                    </Card>
+                  </Grid.Column>
+                ))}
+              </Grid>
+            </>
+          )}
+        </div>
       </div>
-    </div>
-    {feedback &&
-      <div
-        style={{
-          minWidth: '100%',
-          padding: '20px',
-          backgroundColor: feedback.correct ? '#d4edda' : '#f8d7da',
-          color: feedback.correct ? '#155724' : '#721c24',
-          textAlign: 'center',
-          position: 'sticky',
-          bottom: '-3px',
-          left: '0',
-          zIndex: '1000',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column'
-        }}
-      >
-        <Icon name={feedback.correct ? "check circle outline" : "times circle outline"} size="large" />
-        <div style={{ fontSize: '1.2em', marginBottom: '10px' }}>{feedback.message}</div>
-        <Button
-          color={feedback.correct ? "green" : "red"}
-          onClick={handleContinue}
-          style={{ width: '150px' }}
+      {feedback && (
+        <div
+          style={{
+            minWidth: '100%',
+            padding: '20px',
+            backgroundColor: feedback.correct ? '#d4edda' : '#f8d7da',
+            color: feedback.correct ? '#155724' : '#721c24',
+            textAlign: 'center',
+            position: 'sticky',
+            bottom: '-3px',
+            left: '0',
+            zIndex: '1000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column'
+          }}
         >
-          {currentIndex === generatedQuestions.length - 1  ? "Finish" : "Continue"}
-          
-        </Button>
-      </div>
-    }
-  </Container>
-);
+          <Icon name={feedback.correct ? "check circle outline" : "times circle outline"} size="large" />
+          <div style={{ fontSize: '1.2em', marginBottom: '10px' }}>{feedback.message}</div>
+          <Button
+            color={feedback.correct ? "green" : "red"}
+            onClick={handleContinue}
+            style={{ width: '150px' }}
+          >
+            {currentIndex === generatedQuestions.length - 1 && isLastPart ? "Finish" : "Continue"}
+          </Button>
+        </div>
+      )}
+    </Container>
+  );
 });
 
 export default Assessment;

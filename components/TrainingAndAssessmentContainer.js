@@ -11,6 +11,14 @@ const shuffleArray = (array) => {
   return array.sort(() => Math.random() - 0.5);
 };
 
+const divideQuestions = (questions, partSize) => {
+  const parts = [];
+  for (let i = 0; i < questions.length; i += partSize) {
+    parts.push(questions.slice(i, i + partSize));
+  }
+  return parts;
+};
+
 const TrainingAndAssessmentContainer = observer(() => {
   const { questions, selectedLesson, score } = questionSessionStore;
   const PART_SIZE = 4;
@@ -21,6 +29,7 @@ const TrainingAndAssessmentContainer = observer(() => {
   const [endTime, setEndTime] = useState(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [timerInterval, setTimerInterval] = useState(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const navigate = useNavigate();
 
@@ -43,32 +52,28 @@ const TrainingAndAssessmentContainer = observer(() => {
       setIsTraining(false);
     } else {
       const nextIndex = currentIndex + PART_SIZE;
-      if (nextIndex >= questions.length - 1) {
+      if (nextIndex >= questions.length) {
         setEndTime(new Date());
-        setPartIndex(partIndex + 1);
+        setShowConfetti(true);
+        clearInterval(timerInterval);
+        setTimeout(() => {
+          navigate("/student");
+        }, 4000);
       } else {
         setCurrentIndex(nextIndex);
         setIsTraining(true);
+        setPartIndex(partIndex + 1);
       }
     }
   };
 
-  useEffect(() => {
-    if (partIndex * PART_SIZE >= questions.length) {
-      clearInterval(timerInterval);
-      setTimeout(() => {
-        navigate("/student");
-      }, 4000);
-    }
-  }, [partIndex, questions.length, navigate, timerInterval]);
-
-  const currentPart = questions.slice(currentIndex, currentIndex + PART_SIZE);
+  const parts = divideQuestions(questions, PART_SIZE);
+  const currentPart = parts[partIndex];
 
   if (!selectedLesson) {
     return <div>Please select a lesson to start.</div>;
   }
 
-  // Format the time elapsed in minutes and seconds
   const formattedTime = `${Math.floor(timeElapsed / 60)
     .toString()
     .padStart(2, "0")}:${(timeElapsed % 60).toString().padStart(2, "0")}`;
@@ -124,13 +129,7 @@ const TrainingAndAssessmentContainer = observer(() => {
           margin: "20px",
         }}
       >
-        {partIndex * PART_SIZE < questions.length ? (
-          isTraining ? (
-            <Training questions={currentPart} handleNext={handleNext} />
-          ) : (
-            <Assessment questions={currentPart} handleNext={handleNext} PART_SIZE={PART_SIZE} partIndex={partIndex}  />
-          )
-        ) : (
+        {showConfetti ? (
           <div style={{ textAlign: "center" }}>
             <Header as="h2" style={{ color: "#21ba45", marginBottom: "20px" }}>
               Congratulations! You have completed all parts.
@@ -141,6 +140,20 @@ const TrainingAndAssessmentContainer = observer(() => {
             </p>
             <Confetti />
           </div>
+        ) : (
+          currentPart && (
+            <>
+              {isTraining ? (
+                <Training questions={currentPart} handleNext={handleNext} />
+              ) : (
+                <Assessment
+                  questions={currentPart}
+                  handleNext={handleNext}
+                  isLastPart={partIndex === parts.length - 1}
+                />
+              )}
+            </>
+          )
         )}
       </div>
     </Container>
