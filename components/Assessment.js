@@ -9,11 +9,11 @@ const shuffleArray = (array) => {
   return array.sort(() => Math.random() - 0.5);
 };
 
-const Assessment = observer(({ questions, handleNext, isLastPart }) => {
+const Assessment = observer(({ questions, handleNext, isLastPart, selectedLessonId, selectedChapterId ,username }) => {
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [feedback, setFeedback] = useState(null);
-  const [attempted, setAttempted] = useState(false); // New state to track if the question has been attempted
+  const [attempted, setAttempted] = useState(false);
 
   const handleImageClick = (correct) => {
     const sound = correct ? correctSound : wrongSound;
@@ -23,10 +23,10 @@ const Assessment = observer(({ questions, handleNext, isLastPart }) => {
     setFeedback({ message: feedbackMessage, correct: feedbackCorrect });
 
     if (correct && !attempted) {
-      questionSessionStore.incrementScore(); // Update the score in the store if the answer is correct on the first try
+      questionSessionStore.incrementScore();
     }
 
-    setAttempted(true); // Set attempted to true after the first click
+    setAttempted(true);
   };
 
   const handlePlayAudio = () => {
@@ -37,14 +37,17 @@ const Assessment = observer(({ questions, handleNext, isLastPart }) => {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (feedback.correct) {
       setFeedback(null);
       if (currentIndex < generatedQuestions.length - 1) {
         setCurrentIndex(currentIndex + 1);
-        setAttempted(false); // Reset attempted for the next question
+        setAttempted(false);
       } else {
-        handleNext(); // Call handleNext to proceed to the next step or show confetti
+        if (isLastPart) {
+          await updateCompletedChapters(username, selectedChapterId, selectedLessonId, questionSessionStore.score);
+        }
+        handleNext();
       }
     } else {
       const updatedQuestions = [...generatedQuestions];
@@ -64,6 +67,28 @@ const Assessment = observer(({ questions, handleNext, isLastPart }) => {
     if (!audioPath) return "";
     const fileName = audioPath.split("/").slice(-2, -1)[0] + ".mp3";
     return `http://localhost:3000/aws/data/${audioPath}${fileName}`;
+  };
+
+  const updateCompletedChapters = async (username, chapter_id, lesson_id, score) => {
+    try {
+   
+      const response = await fetch(`http://localhost:3000/user/${username}/completedChapters`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ chapter_id, lesson_id, score }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update completed chapters');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error updating completed chapters:', error);
+    }
   };
 
   useEffect(() => {

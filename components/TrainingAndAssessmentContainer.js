@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Header, Container, Icon } from "semantic-ui-react";
+import { Header, Container, Icon,Button } from "semantic-ui-react";
 import { useNavigate } from "react-router-dom";
 import Confetti from "react-confetti";
 import Training from "./Training";
@@ -19,7 +19,8 @@ const divideQuestions = (questions, partSize) => {
   return parts;
 };
 
-const TrainingAndAssessmentContainer = observer(() => {
+const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId,username }) => {
+
   const { questions, selectedLesson, score } = questionSessionStore;
   const PART_SIZE = 4;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -66,6 +67,10 @@ const TrainingAndAssessmentContainer = observer(() => {
       }
     }
   };
+  const handleNextLesson = () => {
+    questionSessionStore.clear();
+    navigate("/student"); 
+  }
 
   const parts = divideQuestions(questions, PART_SIZE);
   const currentPart = parts[partIndex];
@@ -139,6 +144,7 @@ const TrainingAndAssessmentContainer = observer(() => {
               Score: {score} / {questions.length}
             </p>
             <Confetti />
+            <Button primary onClick={handleNextLesson}>Next Lesson</Button>
           </div>
         ) : (
           currentPart && (
@@ -150,6 +156,9 @@ const TrainingAndAssessmentContainer = observer(() => {
                   questions={currentPart}
                   handleNext={handleNext}
                   isLastPart={partIndex === parts.length - 1}
+                  selectedLessonId={selectedLessonId}
+                  selectedChapterId={selectedChapterId}
+                  username={username}
                 />
               )}
             </>

@@ -45,7 +45,7 @@ const ViewAllStudents = ({ setSelectedStudent }) => {
 
     return (
         <Container>
-            <Header as='h2' textAlign='center'></Header>
+            <Header as='h2' textAlign='center'>All Students</Header>
             {loading && (
                 <Dimmer active inverted>
                     <Loader size='large'>Loading...</Loader>
@@ -71,7 +71,20 @@ const ViewAllStudents = ({ setSelectedStudent }) => {
                             <Table.Row key={index} onClick={() => setSelectedStudent(student)} style={{ cursor: 'pointer' }}>
                                 <Table.Cell>{student.username}</Table.Cell>
                                 <Table.Cell>{student.instituteName}</Table.Cell>
-                                <Table.Cell>{student.chapterCompleted.join(', ')}</Table.Cell>
+                                <Table.Cell>
+                                    {student.completedChapters.map(chapter => (
+                                        <div key={chapter._id}>
+                                            <p><strong>Chapter ID:</strong> {chapter.chapter_id}</p>
+                                            <ul>
+                                                {chapter.completedLessons.map(lesson => (
+                                                    <li key={lesson._id}>
+                                                        Lesson ID: {lesson.lesson_id}, Score: {lesson.score}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>

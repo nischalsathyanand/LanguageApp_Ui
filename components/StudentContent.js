@@ -16,7 +16,8 @@ const colorPalette = {
 
 const getColorForChapter = (index) => colorPalette[index % Object.keys(colorPalette).length];
 
-const StudentContent = observer(({ selectedLanguage }) => {
+const StudentContent = observer(({ selectedLanguage,username }) => {
+  
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -229,7 +230,14 @@ const StudentContent = observer(({ selectedLanguage }) => {
           </div>
         </Modal.Header>
         <Modal.Content>
-          <TrainingAndAssessmentContainer questionSessionStore={questionSessionStore} />
+        <TrainingAndAssessmentContainer
+            questionSessionStore={questionSessionStore}
+            selectedLessonId={selectedLesson?._id}
+            selectedChapterId={selectedLesson?.chapterId}
+            username={username}
+          />
+        
+
         </Modal.Content>
       </Modal>
     </Container>

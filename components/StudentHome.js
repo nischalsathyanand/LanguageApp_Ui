@@ -13,23 +13,27 @@ import {
   DropdownItem,
   Loader,
   Flag,
-  Card,
 } from "semantic-ui-react";
-import { useLocation } from "react-router-dom";
-import StudentContent from "./StudentContent";
 import { useNavigate } from "react-router-dom";
-import { PiStudent } from "react-icons/pi";
+import StudentContent from "./StudentContent";
 import StudentLanguageSelecter from "./StudentLanguageSelecter";
 
 const StudentHome = () => {
-  const location = useLocation();
-  const username = location.state?.username || "Default Username";
+  const [username, setUsername] = useState("Default Username");
   const [languages, setLanguages] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [loadingLanguages, setLoadingLanguages] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch the username from session storage
+    const storedUsername = sessionStorage.getItem('username');
+ 
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+
+    // Fetch languages
     const fetchLanguages = async () => {
       try {
         const response = await fetch("http://localhost:3000/api/v1/languages");
@@ -50,6 +54,8 @@ const StudentHome = () => {
   };
 
   const handleLogout = () => {
+    // Clear session storage
+    sessionStorage.clear();
     navigate("/login");
   };
 
@@ -137,14 +143,14 @@ const StudentHome = () => {
               fixed="top"
               style={{
                 height: "80px",
-                backgroundColor: "#58CC02", // Dark yellow background color
-                fontSize: "1.4rem", // Increased font size for the menu
+                backgroundColor: "#58CC02",
+                fontSize: "1.4rem",
                 color: "white",
                 display: "flex",
                 alignItems: "center",
                 padding: "0 1em",
                 zIndex: 1000,
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Adding shadow for elegance
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               }}
             >
               {loadingLanguages ? (
@@ -157,7 +163,7 @@ const StudentHome = () => {
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <Flag
                           name={languageCodeMap[selectedLanguage.name]}
-                          style={{ marginRight: "10px", fontSize: "2rem" }} // Updated font size to 2rem
+                          style={{ marginRight: "10px", fontSize: "2rem" }}
                         />
                         <span style={{ fontSize: "1.4rem" }}>
                           {selectedLanguage.name}
@@ -185,7 +191,7 @@ const StudentHome = () => {
                         <div style={{ display: "flex", alignItems: "center" }}>
                           <Flag
                             name={languageCodeMap[language.name]}
-                            style={{ marginRight: "10px", fontSize: "2rem" }} // Updated font size to 2rem
+                            style={{ marginRight: "10px", fontSize: "2rem" }}
                           />
                           {language.name}
                         </div>
@@ -231,22 +237,18 @@ const StudentHome = () => {
 
             <div style={{ marginTop: "80px" }}>
               {selectedLanguage ? (
-                <StudentContent selectedLanguage={selectedLanguage} />
+                <StudentContent selectedLanguage={selectedLanguage} username={username} />
               ) : (
-                <div>
                 <StudentLanguageSelecter
                   languages={languages}
                   languageCodeMap={languageCodeMap}
                   handleLanguageChange={handleLanguageChange}
                 />
-              </div>
               )}
             </div>
-           
           </Grid.Column>
         </Grid.Row>
-     
-        </Grid>
+      </Grid>
     </div>
   );
 };

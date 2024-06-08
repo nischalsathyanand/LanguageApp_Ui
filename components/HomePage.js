@@ -1,12 +1,14 @@
 import React from 'react';
-import earthImage from '../images/earth.jpg'; // Ensure you have the correct path to the image
+
 import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const handleGetStart =()=>{
+  
+  const handleGetStart = () => {
     navigate('/login');
-  }
+  };
+
   const styles = {
     homepage: {
       display: 'flex',
@@ -15,7 +17,7 @@ const HomePage = () => {
       justifyContent: 'center',
       height: '100vh',
       backgroundColor: '#1a73e8',
-      backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")', // Example star pattern
+  
       color: 'white',
       textAlign: 'center',
     },
@@ -26,21 +28,10 @@ const HomePage = () => {
     },
     content: {
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    earth: {
-      width: '300px',
-      height: '300px',
-      background: `url(${earthImage}) no-repeat center center`,
-      backgroundSize: 'contain',
-      marginRight: '2em', // Space between the earth and text content
-    },
-    textContent: {
-      display: 'flex',
       flexDirection: 'column',
-      alignItems: 'flex-start', // Align text and button to the left
+      alignItems: 'center',
     },
+    
     tagline: {
       fontSize: '1.5em',
       marginBottom: '1em',
@@ -65,17 +56,15 @@ const HomePage = () => {
       <div style={styles.header}>Lantoon</div>
       <div style={styles.content}>
         <div style={styles.earth}></div>
-        <div style={styles.textContent}>
-          <div style={styles.tagline}>Learn a new language the way you learn best</div>
-          <button
-            style={styles.getStartedButton}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = styles.getStartedButtonHover.backgroundColor)}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = styles.getStartedButton.backgroundColor)}
-            onClick={handleGetStart}
-          >
-            Get Started
-          </button>
-        </div>
+        <div style={styles.tagline}>Learn a new language the way you learn best</div>
+        <button
+          style={styles.getStartedButton}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = styles.getStartedButtonHover.backgroundColor)}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = styles.getStartedButton.backgroundColor)}
+          onClick={handleGetStart}
+        >
+          Get Started
+        </button>
       </div>
     </div>
   );
