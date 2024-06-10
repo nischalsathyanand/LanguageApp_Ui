@@ -9,7 +9,8 @@ const shuffleArray = (array) => {
   return array.sort(() => Math.random() - 0.5);
 };
 
-const Assessment = observer(({ questions, handleNext, isLastPart, selectedLessonId, selectedChapterId ,username }) => {
+const Assessment = observer(({ questions, handleNext, isLastPart, selectedLessonId, selectedChapterId, username, completedTime}) => {
+ 
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [feedback, setFeedback] = useState(null);
@@ -45,7 +46,9 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
         setAttempted(false);
       } else {
         if (isLastPart) {
-          await updateCompletedChapters(username, selectedChapterId, selectedLessonId, questionSessionStore.score);
+         
+          await updateCompletedChapters(username, selectedChapterId, selectedLessonId, questionSessionStore.score, completedTime);
+          //console.log(completedTime)
         }
         handleNext();
       }
@@ -56,7 +59,7 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
       setFeedback(null);
     }
   };
-
+  
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "";
     const fileName = imagePath.split("/").slice(-2, -1)[0] + ".jpg";
@@ -69,27 +72,28 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
     return `http://localhost:3000/aws/data/${audioPath}${fileName}`;
   };
 
-  const updateCompletedChapters = async (username, chapter_id, lesson_id, score) => {
+  const updateCompletedChapters = async (username, chapter_id, lesson_id, score,completedTime ) => {
     try {
-   
+      console.log(completedTime)
       const response = await fetch(`http://localhost:3000/user/${username}/completedChapters`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ chapter_id, lesson_id, score }),
+        body: JSON.stringify({ chapter_id, lesson_id, score, completedTime }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to update completed chapters');
       }
-
+  
       const data = await response.json();
       return data;
     } catch (error) {
       console.error('Error updating completed chapters:', error);
     }
   };
+  
 
   useEffect(() => {
     const fetchGeneratedQuestions = async () => {
@@ -178,6 +182,7 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
             position: 'sticky',
             bottom: '-3px',
             left: '0',
+           
             zIndex: '1000',
             display: 'flex',
             alignItems: 'center',

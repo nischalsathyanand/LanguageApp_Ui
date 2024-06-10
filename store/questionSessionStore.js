@@ -1,9 +1,10 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable } from "mobx";
 
 class QuestionSessionStore {
   questions = [];
   selectedLesson = null;
   score = 0;
+  completedTime = 0;
 
   constructor() {
     makeAutoObservable(this);
@@ -20,11 +21,16 @@ class QuestionSessionStore {
   incrementScore() {
     this.score += 1;
   }
+
+  setCompletedTime(time) {
+    this.completedTime = time;
+  }
+
   clear() {
     this.questions = [];
     this.selectedLesson = null;
     this.score = 0;
-    
+    this.completedTime = 0;
   }
 }
 

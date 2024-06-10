@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Grid, Header, Icon, Menu, Segment, Sidebar, Divider, Card, Image } from 'semantic-ui-react';
+import { Container, Grid, Header, Icon, Menu, Segment, Sidebar, Divider } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import { useNavigate } from 'react-router-dom'; 
 import ViewAllStudents from './ViewAllStudents';
@@ -16,9 +16,9 @@ const InstituteAdmin = () => {
 
     return (
         <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#f7f7f7', minHeight: '100vh' }}>
-            <Grid>
-                <Grid.Row>
-                    <Grid.Column width={3}>
+            <Grid style={{ margin: 0, height: '100%' }}>
+                <Grid.Row style={{ padding: 0, height: '100%' }}>
+                    <Grid.Column width={3} style={{ padding: 0 }}>
                         <Sidebar
                             as={Menu}
                             animation='overlay'
@@ -49,10 +49,10 @@ const InstituteAdmin = () => {
                             </Menu.Item>
                         </Sidebar>
                     </Grid.Column>
-                    <Grid.Column width={13} style={{ padding: '2em' }}>
-                        <Container>
+                    <Grid.Column width={13} style={{ padding: '2em', height: '100vh', overflowY: 'auto' }}>
+                        <Container fluid>
                             <Grid centered>
-                                <Grid.Row centered>
+                                <Grid.Row>
                                     <Grid.Column textAlign='center'>
                                         <Segment basic textAlign='center'>
                                             <Header as='h1' style={{ color: '#333', marginBottom: '1.5em', fontWeight: 'bold' }}>
@@ -61,20 +61,13 @@ const InstituteAdmin = () => {
                                         </Segment>
                                     </Grid.Column>
                                 </Grid.Row>
-                                <Grid.Row centered>
-                                    <Grid.Column mobile={16} tablet={12} computer={10}>
+                                <Grid.Row>
+                                    <Grid.Column width={selectedStudent ? 10 : 16}>
                                         <Segment vertical style={{ backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
                                             {section === 'viewAll' && <ViewAllStudents setSelectedStudent={setSelectedStudent} />}
                                             {section === 'add' && <AddNewStudent />}
                                         </Segment>
                                     </Grid.Column>
-                                    {selectedStudent && (
-                                        <Grid.Column mobile={16} tablet={12} computer={6}>
-                                            <Segment vertical style={{ backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
-                                                <StudentDetails student={selectedStudent} />
-                                            </Segment>
-                                        </Grid.Column>
-                                    )}
                                 </Grid.Row>
                             </Grid>
                         </Container>
@@ -82,25 +75,6 @@ const InstituteAdmin = () => {
                 </Grid.Row>
             </Grid>
         </div>
-    );
-};
-
-const StudentDetails = ({ student }) => {
-    return (
-        <Container>
-            <Card centered style={{ boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)', marginBottom: '2em' }}>
-                <Image src={student.avatar} wrapped ui={false} />
-                <Card.Content>
-                    <Card.Header style={{ color: '#333', fontSize: '1.5em', marginBottom: '0.5em' }}>{student.username}</Card.Header>
-                    <Card.Meta style={{ color: '#666', marginBottom: '1em' }}>{student.instituteName}</Card.Meta>
-                    <Card.Description>
-                        <p style={{ color: '#333', marginBottom: '0.5em' }}><strong>Course completed:</strong> {student.chapterCompleted.join(', ')}</p>
-                        <p style={{ color: '#333', marginBottom: '0.5em' }}><strong>Last login time:</strong> {student.lastLoggedInTime}</p>
-                        <p style={{ color: '#333', marginBottom: '0' }}><strong>Time spent:</strong> {student.timeSpent}</p>
-                    </Card.Description>
-                </Card.Content>
-            </Card>
-        </Container>
     );
 };
 

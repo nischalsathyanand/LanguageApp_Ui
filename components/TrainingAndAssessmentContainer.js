@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Header, Container, Icon,Button } from "semantic-ui-react";
+import { Header, Container, Icon, Button } from "semantic-ui-react";
 import { useNavigate } from "react-router-dom";
 import Confetti from "react-confetti";
 import Training from "./Training";
@@ -19,9 +19,9 @@ const divideQuestions = (questions, partSize) => {
   return parts;
 };
 
-const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId,username }) => {
+const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId, username  }) => {
 
-  const { questions, selectedLesson, score } = questionSessionStore;
+  const { questions, selectedLesson, score, completedTime} = questionSessionStore;
   const PART_SIZE = 4;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTraining, setIsTraining] = useState(true);
@@ -55,6 +55,12 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
       const nextIndex = currentIndex + PART_SIZE;
       if (nextIndex >= questions.length) {
         setEndTime(new Date());
+        const formattedTime = `${Math.floor(timeElapsed / 60)
+          .toString()
+          .padStart(2, "0")}:${(timeElapsed % 60).toString().padStart(2, "0")}`;
+        console.log(formattedTime); // Check if formattedTime is correct
+        questionSessionStore.setCompletedTime(formattedTime); 
+        console.log(questionSessionStore.completedTime); // Log the updated completedTime
         setShowConfetti(true);
         clearInterval(timerInterval);
         setTimeout(() => {
@@ -67,9 +73,12 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
       }
     }
   };
+  
+  
+
   const handleNextLesson = () => {
     questionSessionStore.clear();
-    navigate("/student"); 
+    navigate("/student");
   }
 
   const parts = divideQuestions(questions, PART_SIZE);
@@ -139,7 +148,7 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
             <Header as="h2" style={{ color: "#21ba45", marginBottom: "20px" }}>
               Congratulations! You have completed all parts.
             </Header>
-            <p>Completed Time: {formattedTime}</p>
+            <p>Completed Time: {completedTime}</p>
             <p>
               Score: {score} / {questions.length}
             </p>
@@ -150,17 +159,20 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
           currentPart && (
             <>
               {isTraining ? (
-                <Training questions={currentPart} handleNext={handleNext} />
-              ) : (
-                <Assessment
-                  questions={currentPart}
-                  handleNext={handleNext}
-                  isLastPart={partIndex === parts.length - 1}
-                  selectedLessonId={selectedLessonId}
-                  selectedChapterId={selectedChapterId}
-                  username={username}
-                />
-              )}
+  <Training questions={currentPart} handleNext={handleNext} />
+) : (
+  <Assessment
+    questions={currentPart}
+    handleNext={handleNext}
+    isLastPart={partIndex === parts.length - 1}
+    selectedLessonId={selectedLessonId}
+    selectedChapterId={selectedChapterId}
+    username={username}
+    completedTime={formattedTime} 
+
+  />
+)}
+
             </>
           )
         )}
