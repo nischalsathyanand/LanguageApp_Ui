@@ -1,29 +1,24 @@
 import React, { useState } from 'react';
-import { Container, Header, Segment, Icon, Button, Form, Message, Grid, Image } from 'semantic-ui-react';
+import { Container, Segment, Button, Form, Message, Grid } from 'semantic-ui-react';
 
 const AddNewStudent = () => {
     const [formData, setFormData] = useState({
-        name: '',
-        username: '',
-        password: '',
-        address: '',
-        class: '',
+        StudentName: '',
+        Email: '',
+        Phone: '',
+        Class: '',
+        Section: '',
+        DOB: '',
+        Roll_No: '',
+        Language: '',
     });
 
-    const [imageFile, setImageFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
-    const [previewImage, setPreviewImage] = useState(null);
 
     const handleChange = (e, { name, value }) => {
         setFormData({ ...formData, [name]: value });
-    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        setImageFile(file);
-        setPreviewImage(URL.createObjectURL(file));
     };
 
     const handleSubmit = async () => {
@@ -33,21 +28,14 @@ const AddNewStudent = () => {
 
         const token = localStorage.getItem('token');
 
-        const form = new FormData();
-        Object.keys(formData).forEach(key => {
-            form.append(key, formData[key]);
-        });
-        if (imageFile) {
-            form.append('image', imageFile);
-        }
-
         try {
-            const response = await fetch('http://localhost:3000/user/v1/addStudent', {
+            const response = await fetch('http://localhost:3000/user/v1/addsinglestudent', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
                 },
-                body: form,
+                body: JSON.stringify(formData),
             });
 
             const responseData = await response.json();
@@ -58,14 +46,15 @@ const AddNewStudent = () => {
 
             setSuccessMessage('Student added successfully');
             setFormData({
-                name: '',
-                username: '',
-                password: '',
-                address: '',
-                class: '',
+                StudentName: '',
+                Email: '',
+                Phone: '',
+                Class: '',
+                Section: '',
+                DOB: '',
+                Roll_No: '',
+                Language: '',
             });
-            setImageFile(null);
-            setPreviewImage(null);
         } catch (error) {
             console.error('Error adding student:', error);
             setError(error.message || 'Failed to add student. Please try again.');
@@ -77,7 +66,6 @@ const AddNewStudent = () => {
     return (
         <Container fluid textAlign='center' style={{ backgroundColor: '#E6EFF4', color: '#1c1c1c', width: '100vw', maxWidth: '100%', padding: '2em' }}>
             <Segment style={{ backgroundColor: '#E7EEF4', color: '#5B9DBF', padding: '3em', borderRadius: '15px' }}>
-                
                 <Form onSubmit={handleSubmit} error={error !== null} success={successMessage !== null} loading={loading}>
                     <Grid columns={2} stackable>
                         <Grid.Row>
@@ -85,55 +73,68 @@ const AddNewStudent = () => {
                                 <Form.Input
                                     label="Student Name"
                                     placeholder='Student Name'
-                                    name='name'
-                                    value={formData.name}
+                                    name='StudentName'
+                                    value={formData.StudentName}
                                     onChange={handleChange}
                                     required
                                 />
                                 <Form.Input
-                                    label="Username"
-                                    placeholder='Username'
-                                    name='username'
-                                    value={formData.username}
+                                    label="Email"
+                                    placeholder='Email'
+                                    name='Email'
+                                    value={formData.Email}
                                     onChange={handleChange}
                                     required
                                 />
                                 <Form.Input
-                                    type='password'
-                                    label='Password'
-                                    placeholder='Password'
-                                    name='password'
-                                    value={formData.password}
+                                    label="Phone"
+                                    placeholder='Phone'
+                                    name='Phone'
+                                    value={formData.Phone}
                                     onChange={handleChange}
                                     required
                                 />
                                 <Form.Input
-                                    label='Class'
+                                    label="Class"
                                     placeholder='Class'
-                                    name='class'
-                                    value={formData.class}
+                                    name='Class'
+                                    value={formData.Class}
                                     onChange={handleChange}
                                     required
                                 />
                             </Grid.Column>
                             <Grid.Column>
                                 <Form.Input
-                                    type='file'
-                                    label='Image'
-                                    onChange={handleImageChange}
-                                    accept="image/*"
-                                />
-                                {previewImage && (
-                                    <Segment textAlign='center' style={{ backgroundColor: '#1c1c1c', color: '#fff' }}>
-                                        <Image src={previewImage} size='small' centered />
-                                    </Segment>
-                                )}
-                                <Form.TextArea
-                                    label='Address'
-                                    placeholder='Address'
-                                    name='address'
-                                    value={formData.address}
+                                    label="Section"
+                                    placeholder='Section'
+                                    name='Section'
+                                    value={formData.Section}
                                     onChange={handleChange}
+                                    required
+                                />
+                                <Form.Input
+                                    type='date'
+                                    label='Date of Birth'
+                                    name='DOB'
+                                    value={formData.DOB}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Form.Input
+                                    label='Roll No'
+                                    placeholder='Roll No'
+                                    name='Roll_No'
+                                    value={formData.Roll_No}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Form.Input
+                                    label='Language'
+                                    placeholder='Language'
+                                    name='Language'
+                                    value={formData.Language}
+                                    onChange={handleChange}
+                                    required
                                 />
                             </Grid.Column>
                         </Grid.Row>

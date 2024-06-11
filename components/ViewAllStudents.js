@@ -136,6 +136,7 @@ const ViewAllStudents = () => {
                 <Table.HeaderCell>Class</Table.HeaderCell>
                 <Table.HeaderCell>Section</Table.HeaderCell>
                 <Table.HeaderCell>DOB</Table.HeaderCell>
+                <Table.HeaderCell>Email</Table.HeaderCell>
                 <Table.HeaderCell>PhoneNo</Table.HeaderCell>
                 <Table.HeaderCell>RollNo</Table.HeaderCell>
                 <Table.HeaderCell>Institute Name</Table.HeaderCell>
@@ -155,6 +156,7 @@ const ViewAllStudents = () => {
                   <Table.Cell>{student.class}</Table.Cell>
                   <Table.Cell>{student.section}</Table.Cell>
                   <Table.Cell>{student.dob}</Table.Cell>
+                  <Table.Cell>{student.email}</Table.Cell>
                   <Table.Cell>{student.phone}</Table.Cell>
                   <Table.Cell>{student.rollno}</Table.Cell>
                   <Table.Cell>{student.instituteName}</Table.Cell>
