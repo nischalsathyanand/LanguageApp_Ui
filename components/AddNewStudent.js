@@ -3,7 +3,7 @@ import { Container, Header, Segment, Icon, Button, Form, Message, Grid, Image } 
 
 const AddNewStudent = () => {
     const [formData, setFormData] = useState({
-        name:'',
+        name: '',
         username: '',
         password: '',
         address: '',
@@ -58,6 +58,7 @@ const AddNewStudent = () => {
 
             setSuccessMessage('Student added successfully');
             setFormData({
+                name: '',
                 username: '',
                 password: '',
                 address: '',
@@ -74,15 +75,11 @@ const AddNewStudent = () => {
     };
 
     return (
-        <Container textAlign='center' style={{ marginTop: '2em' }}>
-            <Header as='h2'>Add Student Section</Header>
-            <Segment>
-                <Header icon textAlign='center'>
-                    <Icon name='user plus' />
-                    Add a new student to the class
-                </Header>
+        <Container fluid textAlign='center' style={{ backgroundColor: '#E6EFF4', color: '#1c1c1c', width: '100vw', maxWidth: '100%', padding: '2em' }}>
+            <Segment style={{ backgroundColor: '#E7EEF4', color: '#5B9DBF', padding: '3em', borderRadius: '15px' }}>
+                
                 <Form onSubmit={handleSubmit} error={error !== null} success={successMessage !== null} loading={loading}>
-                    <Grid columns={2} stackable divided='vertically'>
+                    <Grid columns={2} stackable>
                         <Grid.Row>
                             <Grid.Column>
                                 <Form.Input
@@ -127,7 +124,7 @@ const AddNewStudent = () => {
                                     accept="image/*"
                                 />
                                 {previewImage && (
-                                    <Segment textAlign='center'>
+                                    <Segment textAlign='center' style={{ backgroundColor: '#1c1c1c', color: '#fff' }}>
                                         <Image src={previewImage} size='small' centered />
                                     </Segment>
                                 )}
@@ -151,7 +148,7 @@ const AddNewStudent = () => {
                         header='Error'
                         content={error}
                     />
-                    <Button primary type='submit'>Add Student</Button>
+                    <Button primary type='submit' style={{ backgroundColor: '#E50914', color: '#fff', marginTop: '1em', borderRadius: '15px' }}>Add Student</Button>
                 </Form>
             </Segment>
         </Container>

@@ -235,6 +235,7 @@ const StudentContent = observer(({ selectedLanguage,username }) => {
             selectedLessonId={selectedLesson?._id}
             selectedChapterId={selectedLesson?.chapterId}
             username={username}
+            setModalOpen={setModalOpen}
           />
         
 

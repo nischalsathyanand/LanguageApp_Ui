@@ -20,6 +20,7 @@ import StudentLanguageSelecter from "./StudentLanguageSelecter";
 
 const StudentHome = () => {
   const [username, setUsername] = useState("Default Username");
+  const[name,setName]=useState("Default Username");
   const [languages, setLanguages] = useState([]);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const [loadingLanguages, setLoadingLanguages] = useState(true);
@@ -28,9 +29,14 @@ const StudentHome = () => {
   useEffect(() => {
     // Fetch the username from session storage
     const storedUsername = sessionStorage.getItem('username');
+    const studentName=sessionStorage.getItem('name')
  
     if (storedUsername) {
       setUsername(storedUsername);
+    }
+    if(studentName)
+    {
+      setName(studentName)
     }
 
     // Fetch languages
@@ -229,7 +235,7 @@ const StudentHome = () => {
                       alignItems: "center",
                     }}
                   >
-                    {username}
+                    {name}
                   </span>
                 </Menu.Item>
               </Menu.Menu>

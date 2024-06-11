@@ -1,0 +1,65 @@
+/* styles.css */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Ensure it handles overflow */
+  }
+  
+  .custom-table {
+    background-color: #141414;
+    color: #016FA4; /* Text color for table content */
+    width: 100%;
+    border-collapse: collapse; /* Remove space between cells */
+  }
+  
+  .custom-table th,
+  .custom-table td {
+    padding: 16px; /* Padding for table cells */
+    border: 1px solid #fff; /* White border */
+  }
+  
+  .custom-table th {
+    background-color: #141414; /* Same background as table for header */
+    text-align: center; /* Center align text in header */
+    color: #016FA4; /* Custom header color */
+  }
+  
+  .custom-table td {
+    color: #016FA4; /* Custom content color */
+  }
+  
+  .custom-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Light hover effect */
+  }
+  
+  .custom-table tr {
+    border-bottom: 1px solid #fff; /* White border for rows */
+  }
+  
+  .card-container {
+    background-color: #121212;
+    color: #fff;
+  }
+  
+  .card-container .header {
+    color: #fff;
+  }
+  
+  .card-container .table {
+    background-color: #141414;
+    color: #016FA4; /* Custom content color */
+  }
+  
+  .card-container .table th {
+    background-color: #141414; /* Same background as table for header */
+    color: #016FA4; /* Custom header color */
+  }
+  
+  .card-container .table td {
+    border: 1px solid #fff;
+    color: #016FA4; /* Custom content color */
+  }
+  
+  .card-container .table tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  

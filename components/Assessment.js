@@ -74,7 +74,7 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
 
   const updateCompletedChapters = async (username, chapter_id, lesson_id, score,completedTime ) => {
     try {
-      console.log(completedTime)
+   
       const response = await fetch(`http://localhost:3000/user/${username}/completedChapters`, {
         method: 'PUT',
         headers: {

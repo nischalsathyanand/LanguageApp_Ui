@@ -24,16 +24,18 @@ const LoginPage = () => {
       }
 
       const { token, userInfo } = await response.json();
+  
       localStorage.setItem('token', token);
       sessionStorage.setItem('username', userInfo.username);
-      sessionStorage.setItem('institutekey', userInfo.instituteKey); // Assuming institutekey is part of userInfo
+      sessionStorage.setItem('institutekey', userInfo.instituteKey); 
+      sessionStorage.setItem('name', userInfo.name); 
 
       if (userInfo.role === 'superadmin') {
         navigate('/superadmin');
       } else if (userInfo.role === 'instituteadmin') {
         navigate('/instituteadmin');
       } else if (userInfo.role === 'student') {
-        navigate('/student', { state: { username: userInfo.username } });
+        navigate('/student');
       }
     } catch (error) {
       setError(error.message);

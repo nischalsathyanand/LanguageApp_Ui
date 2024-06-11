@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import {
   Container,
   Table,
-  Header,
   Message,
   Dimmer,
   Loader,
-  Icon,
-  Card,
+  Modal,
   Button,
-  Image, // Import the Image component
+  Image,
 } from "semantic-ui-react";
+import 'semantic-ui-css/semantic.min.css'; // Import Semantic UI CSS
+import './styles.css'; // Import the custom CSS
 
 const ViewAllStudents = () => {
   const [students, setStudents] = useState([]);
@@ -46,10 +46,11 @@ const ViewAllStudents = () => {
           throw new Error("No student details found");
         }
 
-        // Convert timestamp to a normal format for last login time
         const formattedStudents = data.studentDetails.map(student => ({
           ...student,
-          lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString()
+          dob: formatDateOfBirth(student.dob),
+          lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
+          
         }));
 
         setStudents(formattedStudents);
@@ -76,36 +77,44 @@ const ViewAllStudents = () => {
           },
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to delete student");
       }
-  
-      // Reset error state when deletion is successful
+
       setError(null);
-  
+
       setStudents((prevStudents) =>
         prevStudents.filter((student) => student._id !== studentId)
       );
-  
-      // Navigate back to the main table
+
       setSelectedStudent(null);
     } catch (error) {
       console.error("Error deleting student:", error);
       setError("Failed to delete student. Please try again.");
     }
   };
-  
+
   const handleRowClick = (student) => {
     setSelectedStudent(student);
   };
 
-  const handleBackButtonClick = () => {
+  const handleClose = () => {
     setSelectedStudent(null);
   };
 
+  const formatDateOfBirth = (dob) => {
+    const date = new Date(dob);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+ 
+
   return (
-    <Container>
+    <Container fluid className="table-container">
       {loading && (
         <Dimmer active inverted>
           <Loader size="large">Loading...</Loader>
@@ -119,85 +128,105 @@ const ViewAllStudents = () => {
       )}
       {!loading && !error && (
         <>
-          {!selectedStudent ? (
-            <Table celled striped selectable textAlign="center">
-              <Table.Header>
-                <Table.Row>
-                  <Table.HeaderCell>Student Name</Table.HeaderCell>
-                  <Table.HeaderCell>User Name</Table.HeaderCell>
-                  <Table.HeaderCell>Class</Table.HeaderCell>
-                  <Table.HeaderCell>Address</Table.HeaderCell>
-                  <Table.HeaderCell>Institute Name</Table.HeaderCell>
-                  <Table.HeaderCell>Last Login</Table.HeaderCell>
+          <Table className="custom-table" celled striped selectable>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Student Name</Table.HeaderCell>
+                <Table.HeaderCell>UserId</Table.HeaderCell>
+                <Table.HeaderCell>Class</Table.HeaderCell>
+                <Table.HeaderCell>Section</Table.HeaderCell>
+                <Table.HeaderCell>DOB</Table.HeaderCell>
+                <Table.HeaderCell>PhoneNo</Table.HeaderCell>
+                <Table.HeaderCell>RollNo</Table.HeaderCell>
+                <Table.HeaderCell>Institute Name</Table.HeaderCell>
+                <Table.HeaderCell>Password</Table.HeaderCell>
+                <Table.HeaderCell>Last Login</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {students.map((student) => (
+               
+                <Table.Row
+                  key={student._id}
+                  onClick={() => handleRowClick(student)}
+                >
+                  <Table.Cell>{student.name}</Table.Cell>
+                  <Table.Cell>{student.username}</Table.Cell>
+                  <Table.Cell>{student.class}</Table.Cell>
+                  <Table.Cell>{student.section}</Table.Cell>
+                  <Table.Cell>{student.dob}</Table.Cell>
+                  <Table.Cell>{student.phone}</Table.Cell>
+                  <Table.Cell>{student.rollno}</Table.Cell>
+                  <Table.Cell>{student.instituteName}</Table.Cell>
+                  <Table.Cell>{student.password}</Table.Cell>
+                  <Table.Cell>{student.lastLoggedInTime}</Table.Cell>
                 </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {students.map((student) => (
-                  <Table.Row key={student._id} onClick={() => handleRowClick(student)}>
-                    <Table.Cell>{student.name}</Table.Cell>
-                    <Table.Cell>{student.username}</Table.Cell>
-                    <Table.Cell>{student.class}</Table.Cell>
-                    <Table.Cell>{student.address}</Table.Cell>
-                    <Table.Cell>{student.instituteName}</Table.Cell>
-                    <Table.Cell>{student.lastLoggedInTime}</Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-          ) : (
-            <Card fluid>
-              <Card.Content>
-                <Card.Header textAlign="center">{selectedStudent.name}</Card.Header>
-                <Image src={selectedStudent.imageUrl} centered /> {/* Student image */}
-                <Card.Description>
-                  <Table celled striped>
-                    <Table.Header>
-                      <Table.Row>
-                        <Table.HeaderCell>Chapter ID</Table.HeaderCell>
-                        <Table.HeaderCell>Completed Lessons</Table.HeaderCell>
-                        <Table.HeaderCell>Score</Table.HeaderCell>
-                        <Table.HeaderCell>Time Taken</Table.HeaderCell>
+              ))}
+            </Table.Body>
+          </Table>
+
+          {selectedStudent && (
+            <Modal
+              open={!!selectedStudent}
+              onClose={handleClose}
+              size="large"
+              style={{ width: "100%", maxWidth: "none", height: "100vh" }}
+            >
+              <Modal.Header style={{ textAlign: "center" }}>{selectedStudent.name}</Modal.Header>
+              <Modal.Content>
+                <Button
+                  icon="close"
+                  onClick={handleClose}
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    zIndex: "1",
+                    color: "black", // Change icon color to black
+                  }}
+                />
+                <Image wrapped size="medium" src={selectedStudent.imageUrl} />
+                <Table className="custom-table" celled striped>
+                  <Table.Header>
+                    <Table.Row>
+                      <Table.HeaderCell>Chapter ID</Table.HeaderCell>
+                      <Table.HeaderCell>Completed Lessons</Table.HeaderCell>
+                      <Table.HeaderCell>Score</Table.HeaderCell>
+                      <Table.HeaderCell>Time Taken</Table.HeaderCell>
+                    </Table.Row>
+                  </Table.Header>
+                  <Table.Body>
+                    {selectedStudent.completedChapters.map((chapter) => (
+                      <Table.Row key={chapter._id}>
+                        <Table.Cell>{chapter.chapter_id}</Table.Cell>
+                        <Table.Cell>
+                          <ul>
+                            {chapter.completedLessons.map((lesson) => (
+                              <li key={lesson._id}>{lesson.lesson_id}</li>
+                            ))}
+                          </ul>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <ul>
+                            {chapter.completedLessons.map((lesson) => (
+                              <li key={lesson._id}>{lesson.score}</li>
+                            ))}
+                          </ul>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <ul>
+                            {chapter.completedLessons.map((lesson) => (
+                              <li key={lesson._id}>{lesson.completedTime}</li>
+                            ))}
+                          </ul>
+                        </Table.Cell>
                       </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                      {selectedStudent.completedChapters.map((chapter) => (
-                        <Table.Row key={chapter._id}>
-                          <Table.Cell>{chapter.chapter_id}</Table.Cell>
-                          <Table.Cell>
-                            <ul>
-                              {chapter.completedLessons.map((lesson) => (
-                                <li key={lesson._id}>
-                                  {lesson.lesson_id}
-                                </li>
-                              ))}
-                            </ul>
-                          </Table.Cell>
-                          <Table.Cell>
-                            <ul>
-                              {chapter.completedLessons.map((lesson) => (
-                                <li key={lesson._id}>
-                                  {lesson.score}
-                                </li>
-                              ))}
-                            </ul>
-                          </Table.Cell>
-                          <Table.Cell>
-                            <ul>
-                              {chapter.completedLessons.map((lesson) => (
-                                <li key={lesson._id}>
-                                  {lesson.completedTime}
-                                </li>
-                              ))}
-                            </ul>
-                          </Table.Cell>
-                        </Table.Row>
-                      ))}
-                    </Table.Body>
-                  </Table>
-                </Card.Description>
-              </Card.Content>
-              <Card.Content extra>
-                <Button onClick={handleBackButtonClick} basic color="blue">
+                    ))}
+                  </Table.Body>
+                </Table>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button onClick={handleClose} basic color="blue">
                   Back
                 </Button>
                 <Button
@@ -207,8 +236,8 @@ const ViewAllStudents = () => {
                 >
                   Delete Student
                 </Button>
-              </Card.Content>
-            </Card>
+              </Modal.Actions>
+            </Modal>
           )}
         </>
       )}

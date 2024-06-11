@@ -19,7 +19,7 @@ const divideQuestions = (questions, partSize) => {
   return parts;
 };
 
-const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId, username  }) => {
+const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId, username,setModalOpen  }) => {
 
   const { questions, selectedLesson, score, completedTime} = questionSessionStore;
   const PART_SIZE = 4;
@@ -58,9 +58,9 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
         const formattedTime = `${Math.floor(timeElapsed / 60)
           .toString()
           .padStart(2, "0")}:${(timeElapsed % 60).toString().padStart(2, "0")}`;
-        console.log(formattedTime); // Check if formattedTime is correct
+     
         questionSessionStore.setCompletedTime(formattedTime); 
-        console.log(questionSessionStore.completedTime); // Log the updated completedTime
+       
         setShowConfetti(true);
         clearInterval(timerInterval);
         setTimeout(() => {
@@ -78,7 +78,7 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
 
   const handleNextLesson = () => {
     questionSessionStore.clear();
-    navigate("/student");
+    setModalOpen(false)
   }
 
   const parts = divideQuestions(questions, PART_SIZE);
