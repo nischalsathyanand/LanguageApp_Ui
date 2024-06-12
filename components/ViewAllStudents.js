@@ -1,16 +1,72 @@
+
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Table,
-  Message,
-  Dimmer,
-  Loader,
-  Modal,
-  Button,
-  Image,
-} from "semantic-ui-react";
-import 'semantic-ui-css/semantic.min.css'; // Import Semantic UI CSS
-import './styles.css'; // Import the custom CSS
+import { Container, Table, Message, Dimmer, Loader, Modal, Button, Image, Icon } from "semantic-ui-react";
+import styled from 'styled-components';
+
+const StyledContainer = styled(Container)`
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+`;
+
+const StyledTable = styled(Table)`
+  &.ui.table {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    font-size: 14px;
+    color: #333;
+  }
+  &.ui.table thead th {
+    background-color: #f1f3f5;
+    color: #449BC0;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+  }
+  &.ui.table tbody tr {
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+  }
+  &.ui.table tbody tr:hover {
+    background-color: #f9fafb;
+  }
+  &.ui.table tbody td {
+    border-top: 1px solid #eee;
+  }
+  &.ui.table tbody tr:first-child td {
+    border-top: none;
+  }
+`;
+
+const StyledDimmer = styled(Dimmer)`
+  &.ui.dimmer {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+`;
+
+const StyledLoader = styled(Loader)`
+  &.ui.loader {
+    color: #016FA4;
+  }
+`;
+
+const StyledMessage = styled(Message)`
+  &.ui.message {
+    background-color: #fff6f6;
+    color: #9f3a38;
+    border: 1px solid #e0b4b4;
+  }
+`;
+
+const Heading = styled.h1`
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  color:#016DA1;
+`;
 
 const ViewAllStudents = () => {
   const [students, setStudents] = useState([]);
@@ -50,7 +106,6 @@ const ViewAllStudents = () => {
           ...student,
           dob: formatDateOfBirth(student.dob),
           lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
-          
         }));
 
         setStudents(formattedStudents);
@@ -111,24 +166,32 @@ const ViewAllStudents = () => {
     return `${day}-${month}-${year}`;
   };
 
- 
-
   return (
-    <Container fluid className="table-container">
+    <StyledContainer fluid>
+       <Heading>
+      Student Dashboard
+        </Heading>
+        <Button icon color="blue" style={{marginLeft: '10px' }}>
+          <Icon name="download" />
+        </Button>
+        <Button icon color="green" style={{ marginLeft: '10px' }}>
+          <Icon name="users" />
+        </Button>
+      
       {loading && (
-        <Dimmer active inverted>
-          <Loader size="large">Loading...</Loader>
-        </Dimmer>
+        <StyledDimmer active inverted>
+          <StyledLoader size="large">Loading...</StyledLoader>
+        </StyledDimmer>
       )}
       {error && (
-        <Message negative>
+        <StyledMessage negative>
           <Message.Header>Error:</Message.Header>
           <p>{error}</p>
-        </Message>
+        </StyledMessage>
       )}
       {!loading && !error && (
         <>
-          <Table className="custom-table" celled striped selectable>
+          <StyledTable celled striped selectable>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Student Name</Table.HeaderCell>
@@ -146,7 +209,6 @@ const ViewAllStudents = () => {
             </Table.Header>
             <Table.Body>
               {students.map((student) => (
-               
                 <Table.Row
                   key={student._id}
                   onClick={() => handleRowClick(student)}
@@ -165,7 +227,7 @@ const ViewAllStudents = () => {
                 </Table.Row>
               ))}
             </Table.Body>
-          </Table>
+          </StyledTable>
 
           {selectedStudent && (
             <Modal
@@ -174,7 +236,9 @@ const ViewAllStudents = () => {
               size="large"
               style={{ width: "100%", maxWidth: "none", height: "100vh" }}
             >
-              <Modal.Header style={{ textAlign: "center" }}>{selectedStudent.name}</Modal.Header>
+              <Modal.Header style={{ textAlign: "center" }}>
+                {selectedStudent.name}
+              </Modal.Header>
               <Modal.Content>
                 <Button
                   icon="close"
@@ -188,7 +252,7 @@ const ViewAllStudents = () => {
                   }}
                 />
                 <Image wrapped size="medium" src={selectedStudent.imageUrl} />
-                <Table className="custom-table" celled striped>
+                <StyledTable celled striped>
                   <Table.Header>
                     <Table.Row>
                       <Table.HeaderCell>Chapter ID</Table.HeaderCell>
@@ -225,7 +289,7 @@ const ViewAllStudents = () => {
                       </Table.Row>
                     ))}
                   </Table.Body>
-                </Table>
+                </StyledTable>
               </Modal.Content>
               <Modal.Actions>
                 <Button onClick={handleClose} basic color="blue">
@@ -243,7 +307,7 @@ const ViewAllStudents = () => {
           )}
         </>
       )}
-    </Container>
+    </StyledContainer>
   );
 };
 
