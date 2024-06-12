@@ -1,7 +1,20 @@
-
 import React, { useState, useEffect } from "react";
-import { Container, Table, Message, Dimmer, Loader, Modal, Button, Image, Icon } from "semantic-ui-react";
-import styled from 'styled-components';
+import {
+  Container,
+  Table,
+  Message,
+  Dimmer,
+  Loader,
+  Modal,
+  Button,
+  Image,
+  Icon,
+  Input,
+  Pagination,
+} from "semantic-ui-react";
+import styled from "styled-components";
+import 'semantic-ui-css/semantic.min.css';
+import { saveAs } from 'file-saver'; // Import file-saver
 
 const StyledContainer = styled(Container)`
   padding: 0;
@@ -14,7 +27,7 @@ const StyledTable = styled(Table)`
   &.ui.table {
     background-color: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-collapse: separate;
     border-spacing: 0 10px;
     font-size: 14px;
@@ -22,7 +35,7 @@ const StyledTable = styled(Table)`
   }
   &.ui.table thead th {
     background-color: #f1f3f5;
-    color: #449BC0;
+    color: #449bc0;
     font-weight: bold;
     border-bottom: 2px solid #ddd;
   }
@@ -49,7 +62,7 @@ const StyledDimmer = styled(Dimmer)`
 
 const StyledLoader = styled(Loader)`
   &.ui.loader {
-    color: #016FA4;
+    color: #016fa4;
   }
 `;
 
@@ -65,7 +78,7 @@ const Heading = styled.h1`
   text-align: center;
   margin-top: 10px;
   margin-bottom: 10px;
-  color:#016DA1;
+  color: #016da1;
 `;
 
 const ViewAllStudents = () => {
@@ -73,6 +86,11 @@ const ViewAllStudents = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentToDelete, setStudentToDelete] = useState(null);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [studentsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -81,7 +99,7 @@ const ViewAllStudents = () => {
 
       try {
         const token = localStorage.getItem("token");
-        const instituteKey = sessionStorage.getItem('institutekey');
+        const instituteKey = sessionStorage.getItem("institutekey");
         const response = await fetch(
           `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}`,
           {
@@ -102,7 +120,7 @@ const ViewAllStudents = () => {
           throw new Error("No student details found");
         }
 
-        const formattedStudents = data.studentDetails.map(student => ({
+        const formattedStudents = data.studentDetails.map((student) => ({
           ...student,
           dob: formatDateOfBirth(student.dob),
           lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
@@ -160,24 +178,91 @@ const ViewAllStudents = () => {
 
   const formatDateOfBirth = (dob) => {
     const date = new Date(dob);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   };
 
+  const openConfirmationModal = (student) => {
+    setStudentToDelete(student);
+    setConfirmationOpen(true);
+  };
+
+  const closeConfirmationModal = () => {
+    setStudentToDelete(null);
+    setConfirmationOpen(false);
+  };
+
+  const confirmDelete = () => {
+    handleDelete(studentToDelete._id);
+    closeConfirmationModal();
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredStudents = students.filter(
+    (student) =>
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.section.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  const currentStudents = filteredStudents.slice(
+    indexOfFirstStudent,
+    indexOfLastStudent
+  );
+
+  const handlePageChange = (event, data) => {
+    setCurrentPage(data.activePage);
+  };
+
+  const handleDownload = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const instituteKey = sessionStorage.getItem("institutekey");
+      const response = await fetch(
+        `http://localhost:3000/user/v1/download?instituteKey=${instituteKey}&format=csv`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to download student details");
+      }
+
+      const blob = await response.blob();
+      saveAs(blob, "student_details.csv");
+    } catch (error) {
+      console.error("Error downloading student details:", error);
+      setError("Failed to download student details. Please try again.");
+    }
+  };
+
   return (
     <StyledContainer fluid>
-       <Heading>
-      Student Dashboard
-        </Heading>
-        <Button icon color="blue" style={{marginLeft: '10px' }}>
-          <Icon name="download" />
-        </Button>
-        <Button icon color="green" style={{ marginLeft: '10px' }}>
-          <Icon name="users" />
-        </Button>
-      
+      <Heading>Student Dashboard</Heading>
+      <Input
+        icon="search"
+        placeholder="Search Student..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ marginBottom: "20px" }}
+      />
+      <Button icon color="blue" style={{ marginLeft: "10px" }} onClick={handleDownload}>
+        <Icon name="download" />
+      </Button>
+
       {loading && (
         <StyledDimmer active inverted>
           <StyledLoader size="large">Loading...</StyledLoader>
@@ -194,6 +279,7 @@ const ViewAllStudents = () => {
           <StyledTable celled striped selectable>
             <Table.Header>
               <Table.Row>
+                <Table.HeaderCell>Sl No</Table.HeaderCell>
                 <Table.HeaderCell>Student Name</Table.HeaderCell>
                 <Table.HeaderCell>UserId</Table.HeaderCell>
                 <Table.HeaderCell>Class</Table.HeaderCell>
@@ -208,11 +294,12 @@ const ViewAllStudents = () => {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {students.map((student) => (
+              {currentStudents.map((student, index) => (
                 <Table.Row
                   key={student._id}
                   onClick={() => handleRowClick(student)}
                 >
+                  <Table.Cell>{indexOfFirstStudent + index + 1}</Table.Cell>
                   <Table.Cell>{student.name}</Table.Cell>
                   <Table.Cell>{student.username}</Table.Cell>
                   <Table.Cell>{student.class}</Table.Cell>
@@ -228,6 +315,20 @@ const ViewAllStudents = () => {
               ))}
             </Table.Body>
           </StyledTable>
+
+          <Pagination
+            activePage={currentPage}
+            onPageChange={handlePageChange}
+            totalPages={Math.ceil(filteredStudents.length / studentsPerPage)}
+            boundaryRange={0}
+            siblingRange={1}
+            ellipsisItem={null}
+            firstItem={null}
+            lastItem={null}
+            prevItem={{ content: <Icon name="angle left" />, icon: true }}
+            nextItem={{ content: <Icon name="angle right" />, icon: true }}
+            style={{ marginTop: "20px" }}
+          />
 
           {selectedStudent && (
             <Modal
@@ -251,7 +352,11 @@ const ViewAllStudents = () => {
                     color: "black", // Change icon color to black
                   }}
                 />
-                <Image wrapped size="medium" src={selectedStudent.imageUrl} />
+                <Image
+                  wrapped
+                  size="medium"
+                  src={selectedStudent.imageUrl}
+                />
                 <StyledTable celled striped>
                   <Table.Header>
                     <Table.Row>
@@ -298,13 +403,32 @@ const ViewAllStudents = () => {
                 <Button
                   floated="right"
                   color="red"
-                  onClick={() => handleDelete(selectedStudent._id)}
+                  onClick={() => openConfirmationModal(selectedStudent)}
                 >
                   Delete Student
                 </Button>
               </Modal.Actions>
             </Modal>
           )}
+
+          <Modal
+            size="mini"
+            open={confirmationOpen}
+            onClose={closeConfirmationModal}
+          >
+            <Modal.Header>Confirm Delete</Modal.Header>
+            <Modal.Content>
+              <p>Are you sure you want to delete this student?</p>
+            </Modal.Content>
+            <Modal.Actions>
+              <Button negative onClick={closeConfirmationModal}>
+                No
+              </Button>
+              <Button positive onClick={confirmDelete}>
+                Yes
+              </Button>
+            </Modal.Actions>
+          </Modal>
         </>
       )}
     </StyledContainer>
