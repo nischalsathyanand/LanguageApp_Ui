@@ -38,6 +38,7 @@
     "react-sticky-el": "^2.1.0",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.5",
-    "styled-components": "^6.1.11"
+    "styled-components": "^6.1.11",
+    "validator": "^13.12.0"
   }
 }

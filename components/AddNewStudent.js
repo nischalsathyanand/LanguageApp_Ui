@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Segment, Button, Form, Message, Grid } from 'semantic-ui-react';
+import validator from 'validator';
 
 const AddNewStudent = () => {
     const [formData, setFormData] = useState({
@@ -16,9 +17,39 @@ const AddNewStudent = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
+    const [formErrors, setFormErrors] = useState({});
 
     const handleChange = (e, { name, value }) => {
         setFormData({ ...formData, [name]: value });
+    };
+
+    const validateForm = () => {
+        const errors = {};
+        if (validator.isEmpty(formData.StudentName)) {
+            errors.StudentName = 'StudentName is required';
+        }
+        if (!validator.isEmail(formData.Email)) {
+            errors.Email = 'Valid Email is required';
+        }
+        if (!validator.isMobilePhone(formData.Phone)) {
+            errors.Phone = 'Valid Phone number is required';
+        }
+        if (validator.isEmpty(formData.Class)) {
+            errors.Class = 'Class is required';
+        }
+        if (validator.isEmpty(formData.Section)) {
+            errors.Section = 'Section is required';
+        }
+        if (!validator.isDate(formData.DOB)) {
+            errors.DOB = 'Valid DOB is required';
+        }
+        if (validator.isEmpty(formData.Roll_No)) {
+            errors.Roll_No = 'Roll_No is required';
+        }
+        if (validator.isEmpty(formData.Language)) {
+            errors.Language = 'Language is required';
+        }
+        return errors;
     };
 
     const handleSubmit = async () => {
@@ -26,6 +57,14 @@ const AddNewStudent = () => {
         setError(null);
         setSuccessMessage(null);
 
+        const errors = validateForm();
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            setLoading(false);
+            return;
+        }
+
+        setFormErrors({});
         const token = localStorage.getItem('token');
 
         try {
@@ -76,6 +115,7 @@ const AddNewStudent = () => {
                                     name='StudentName'
                                     value={formData.StudentName}
                                     onChange={handleChange}
+                                    error={formErrors.StudentName ? { content: formErrors.StudentName } : null}
                                     required
                                 />
                                 <Form.Input
@@ -84,6 +124,7 @@ const AddNewStudent = () => {
                                     name='Email'
                                     value={formData.Email}
                                     onChange={handleChange}
+                                    error={formErrors.Email ? { content: formErrors.Email } : null}
                                     required
                                 />
                                 <Form.Input
@@ -92,6 +133,7 @@ const AddNewStudent = () => {
                                     name='Phone'
                                     value={formData.Phone}
                                     onChange={handleChange}
+                                    error={formErrors.Phone ? { content: formErrors.Phone } : null}
                                     required
                                 />
                                 <Form.Input
@@ -100,6 +142,7 @@ const AddNewStudent = () => {
                                     name='Class'
                                     value={formData.Class}
                                     onChange={handleChange}
+                                    error={formErrors.Class ? { content: formErrors.Class } : null}
                                     required
                                 />
                             </Grid.Column>
@@ -110,6 +153,7 @@ const AddNewStudent = () => {
                                     name='Section'
                                     value={formData.Section}
                                     onChange={handleChange}
+                                    error={formErrors.Section ? { content: formErrors.Section } : null}
                                     required
                                 />
                                 <Form.Input
@@ -118,6 +162,7 @@ const AddNewStudent = () => {
                                     name='DOB'
                                     value={formData.DOB}
                                     onChange={handleChange}
+                                    error={formErrors.DOB ? { content: formErrors.DOB } : null}
                                     required
                                 />
                                 <Form.Input
@@ -126,6 +171,7 @@ const AddNewStudent = () => {
                                     name='Roll_No'
                                     value={formData.Roll_No}
                                     onChange={handleChange}
+                                    error={formErrors.Roll_No ? { content: formErrors.Roll_No } : null}
                                     required
                                 />
                                 <Form.Input
@@ -134,6 +180,7 @@ const AddNewStudent = () => {
                                     name='Language'
                                     value={formData.Language}
                                     onChange={handleChange}
+                                    error={formErrors.Language ? { content: formErrors.Language } : null}
                                     required
                                 />
                             </Grid.Column>
