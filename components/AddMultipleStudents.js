@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Form, Segment, Header } from 'semantic-ui-react';
+import { Button, Form, Segment, Header, Icon } from 'semantic-ui-react';
 
 const AddMultipleStudents = () => {
     const [file, setFile] = useState(null);
@@ -7,12 +7,19 @@ const AddMultipleStudents = () => {
     const [message, setMessage] = useState('');
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        if (selectedFile && selectedFile.type === 'text/csv') {
+            setFile(selectedFile);
+            setMessage('');
+        } else {
+            setFile(null);
+            setMessage('Please select a valid CSV file.');
+        }
     };
 
     const handleUpload = async () => {
         if (!file) {
-            setMessage('Please select a file to upload');
+            setMessage('Please select a CSV file to upload');
             return;
         }
 
@@ -20,7 +27,7 @@ const AddMultipleStudents = () => {
         formData.append('csvFile', file);
 
         const token = localStorage.getItem('token');
-        console.log(token)// Adjust this according to how you store the token
+        console.log(token); // Adjust this according to how you store the token
 
         try {
             setUploading(true);
@@ -46,15 +53,50 @@ const AddMultipleStudents = () => {
         }
     };
 
+    const handleDownloadSample = async () => {
+        const token = localStorage.getItem('token');
+        const instituteKey = sessionStorage.getItem("institutekey");
+    
+        try {
+            const response = await fetch(`http://localhost:3000/user/v1/download/sample?instituteKey=${instituteKey}&format=csv`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    
+            if (!response.ok) {
+                const result = await response.json();
+                setMessage(`Error: ${result.message}`);
+                return;
+            }
+    
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sample.csv';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } catch (error) {
+            console.error('Error downloading sample CSV:', error);
+            setMessage('Error downloading sample CSV');
+        }
+    };
+    
     return (
         <Segment>
-            <Header as='h3'>Upload CSV to Add Multiple Students</Header>
+            <Header as='h4'>Upload CSV to Add Multiple Students</Header>
             <Form>
                 <Form.Field>
                     <input type="file" accept=".csv" onChange={handleFileChange} />
                 </Form.Field>
                 <Button type="button" onClick={handleUpload} loading={uploading} disabled={uploading}>
                     Upload
+                </Button>
+                <Button color="green" onClick={handleDownloadSample}>
+                    <Icon name="download" />Download Sample CSV
                 </Button>
                 {message && <p>{message}</p>}
             </Form>

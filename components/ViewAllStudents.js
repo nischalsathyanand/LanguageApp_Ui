@@ -11,6 +11,7 @@ import {
   Icon,
   Input,
   Pagination,
+  Dropdown,
 } from "semantic-ui-react";
 import styled from "styled-components";
 import 'semantic-ui-css/semantic.min.css';
@@ -83,6 +84,7 @@ const Heading = styled.h1`
 
 const ViewAllStudents = () => {
   const [students, setStudents] = useState([]);
+  const [allStudents, setAllStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -91,52 +93,143 @@ const ViewAllStudents = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [studentsPerPage] = useState(10);
+  const [classes, setClasses] = useState([]);
+ const [sections, setSections] = useState([]);
+ const [selectedClass, setSelectedClass] = useState("");
+const [selectedSection, setSelectedSection] = useState("");
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      setLoading(true);
-      setError(null);
+const classOptions = classes.map((cls) => ({
+  key: cls,
+  text: cls,
+  value: cls,
+}));
 
-      try {
-        const token = localStorage.getItem("token");
-        const instituteKey = sessionStorage.getItem("institutekey");
-        const response = await fetch(
-          `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+const sectionOptions = sections.map((sec) => ({
+  key: sec,
+  text: sec,
+  value: sec,
+}));
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch student details");
+ useEffect(() => {
+  const fetchStudents = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      const instituteKey = sessionStorage.getItem("institutekey");
+      const response = await fetch(
+        `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const data = await response.json();
-        if (!data.studentDetails || !Array.isArray(data.studentDetails)) {
-          throw new Error("No student details found");
-        }
-
-        const formattedStudents = data.studentDetails.map((student) => ({
-          ...student,
-          dob: formatDateOfBirth(student.dob),
-          lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
-        }));
-
-        setStudents(formattedStudents);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching student details:", error);
-        setError("Failed to fetch student details. Please try again.");
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch student details");
       }
-    };
 
-    fetchStudents();
-  }, []);
+      const data = await response.json();
+      if (!data.studentDetails || !Array.isArray(data.studentDetails)) {
+        throw new Error("No student details found");
+      }
+
+      const formattedStudents = data.studentDetails.map((student) => ({
+        ...student,
+        dob: formatDateOfBirth(student.dob),
+        lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
+      }));
+
+      setStudents(formattedStudents);
+
+      // Extract unique classes and sections
+    
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching student details:", error);
+      setError("Failed to fetch student details. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  fetchStudents();
+}, [selectedClass,selectedSection]);
+
+
+useEffect(() => {
+  const fetchAllStudents = async () => {
+    setLoading(true);
+    // setError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      const instituteKey = sessionStorage.getItem("institutekey");
+      const response = await fetch(
+        `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch student details");
+      }
+
+      const data = await response.json();
+      if (!data) {
+        throw new Error("No student details found");
+      }
+
+      setAllStudents(data);
+      const formattedStudents = data.studentDetails.map((student) => ({
+        ...student,
+        dob: formatDateOfBirth(student.dob),
+        lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
+      }));
+
+      // Extract unique classes and sections
+      const uniqueClasses = [
+        ...new Set(formattedStudents.map((student) => student.class)),
+      ];
+      const uniqueSections = [
+        ...new Set(formattedStudents.map((student) => student.section)),
+      ];
+
+      setClasses(uniqueClasses);
+      setSections(uniqueSections);
+
+      // setLoading(false);
+    } catch (error) {
+      console.error("Error fetching student details:", error);
+      setError("Failed to fetch student details. Please try again.");
+      // setLoading(false);
+    }
+  };
+
+  fetchAllStudents();
+}, [selectedClass,selectedSection]);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const handleDelete = async (studentId) => {
     try {
@@ -199,22 +292,32 @@ const ViewAllStudents = () => {
     closeConfirmationModal();
   };
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
+
+  const handleClassChange = (e, { value }) => {
+    setSelectedClass(value);
+    // Optionally, you can filter students by the selected class here
+  };
+  
+  const handleSectionChange = (e, { value }) => {
+    setSelectedSection(value);
+    // Optionally, you can filter students by the selected section here
   };
 
-  const filteredStudents = students.filter(
-    (student) =>
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.section.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  // const filteredStudents = students.filter((student) => {
+  //   return (
+  //     (selectedClass === "" || student.class === selectedClass) &&
+  //     (selectedSection === "" || student.section === selectedSection) &&
+  //     (student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       student.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       student.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       student.section.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       student.email.toLowerCase().includes(searchTerm.toLowerCase()))
+  //   );
+  // });
+  
   const indexOfLastStudent = currentPage * studentsPerPage;
   const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = filteredStudents.slice(
+  const currentStudents = students.slice(
     indexOfFirstStudent,
     indexOfLastStudent
   );
@@ -223,46 +326,59 @@ const ViewAllStudents = () => {
     setCurrentPage(data.activePage);
   };
 
-  const handleDownload = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const instituteKey = sessionStorage.getItem("institutekey");
-      const response = await fetch(
-        `http://localhost:3000/user/v1/download?instituteKey=${instituteKey}&format=csv`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+   const handleDownload = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const instituteKey = sessionStorage.getItem("institutekey");
+            const response = await fetch(
+                `http://localhost:3000/user/v1/download?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}&format=csv`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to download student details");
+            }
+
+            const blob = await response.blob();
+            saveAs(blob, "student_details.csv");
+            setError('');
+            setSelectedClass('');
+            setSelectedSection('')
+        } catch (error) {
+            console.error("Error downloading student details:", error);
+            setError("Failed to download student details. Please try again.");
         }
-      );
+    };
 
-      if (!response.ok) {
-        throw new Error("Failed to download student details");
-      }
-
-      const blob = await response.blob();
-      saveAs(blob, "student_details.csv");
-    } catch (error) {
-      console.error("Error downloading student details:", error);
-      setError("Failed to download student details. Please try again.");
-    }
-  };
 
   return (
     <StyledContainer fluid>
       <Heading>Student Dashboard</Heading>
-      <Input
-        icon="search"
-        placeholder="Search Student..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-        style={{ marginBottom: "20px" }}
-      />
-      <Button icon color="blue" style={{ marginLeft: "10px" }} onClick={handleDownload}>
-        <Icon name="download" />
-      </Button>
+      
+     
+      <Dropdown
+  placeholder='Select Class'
+ 
+  selection
+  options={classOptions}
+  onChange={handleClassChange}
+/>
+<Dropdown
+  placeholder='Select Section'
+ 
+  selection
+  options={sectionOptions}
+  onChange={handleSectionChange}
+/>
 
+<Button onClick={handleDownload} color="green">
+          <Icon name="download" /> Download Student Details
+        </Button>
       {loading && (
         <StyledDimmer active inverted>
           <StyledLoader size="large">Loading...</StyledLoader>
@@ -319,7 +435,7 @@ const ViewAllStudents = () => {
           <Pagination
             activePage={currentPage}
             onPageChange={handlePageChange}
-            totalPages={Math.ceil(filteredStudents.length / studentsPerPage)}
+            totalPages={Math.ceil(students.length / studentsPerPage)}
             boundaryRange={0}
             siblingRange={1}
             ellipsisItem={null}

@@ -131,20 +131,21 @@ const InstituteAdmin = () => {
             </StyledMenuItem>
             <StyledMenuItem
               as='a'
-              onClick={() => setSection('add')}
-              active={section === 'add'}
-            >
-              <Icon name='user plus' style={{ marginRight: '1em' }} />
-              <span>Add Student</span>
-            </StyledMenuItem>
-            <StyledMenuItem
-              as='a'
               onClick={() => setSection('addMultiple')}
               active={section === 'addMultiple'}
             >
               <Icon name='users' style={{ marginRight: '1em' }} />
               <span>Add Multiple Students</span>
             </StyledMenuItem>
+            <StyledMenuItem
+              as='a'
+              onClick={() => setSection('add')}
+              active={section === 'add'}
+            >
+              <Icon name='user plus' style={{ marginRight: '1em' }} />
+              <span>Add Student</span>
+            </StyledMenuItem>
+         
             <StyledMenuItem
               as='a'
               onClick={handleLogout}
@@ -162,7 +163,12 @@ const InstituteAdmin = () => {
                 <ViewAllStudents setSelectedStudent={setSelectedStudent} />
                 </>)
             }
-           
+            {section === 'addMultiple' && (
+              <>
+                <Header as='h3'>Add Multiple Students</Header>
+                <AddMultipleStudents />
+              </>
+            )}
               
              {section === 'add' && (
               <>
@@ -170,12 +176,7 @@ const InstituteAdmin = () => {
                 <AddNewStudent />
               </>
             )}
-            {section === 'addMultiple' && (
-              <>
-                <Header as='h3'>Add Multiple Students</Header>
-                <AddMultipleStudents />
-              </>
-            )}
+           
           </Container>
         </MainSection>
       </Layout>
