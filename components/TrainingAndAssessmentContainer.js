@@ -19,8 +19,8 @@ const divideQuestions = (questions, partSize) => {
   return parts;
 };
 
-const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId, username,setModalOpen  }) => {
-
+const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId, username,setModalOpen,  selectedChapterName,selectedLessonName }) => {
+  
   const { questions, selectedLesson, score, completedTime} = questionSessionStore;
   const PART_SIZE = 4;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -169,6 +169,8 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
     selectedChapterId={selectedChapterId}
     username={username}
     completedTime={formattedTime} 
+    selectedChapterName={selectedChapterName}
+    selectedLessonName={selectedLessonName}
 
   />
 )}

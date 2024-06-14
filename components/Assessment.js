@@ -9,7 +9,7 @@ const shuffleArray = (array) => {
   return array.sort(() => Math.random() - 0.5);
 };
 
-const Assessment = observer(({ questions, handleNext, isLastPart, selectedLessonId, selectedChapterId, username, completedTime}) => {
+const Assessment = observer(({ questions, handleNext, isLastPart, selectedLessonId, selectedChapterId, username, completedTime,selectedChapterName,selectedLessonName}) => {
  
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -47,7 +47,7 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
       } else {
         if (isLastPart) {
          
-          await updateCompletedChapters(username, selectedChapterId, selectedLessonId, questionSessionStore.score, completedTime);
+          await updateCompletedChapters(username, selectedChapterName,selectedLessonName, questionSessionStore.score, completedTime);
           //console.log(completedTime)
         }
         handleNext();

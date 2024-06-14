@@ -14,8 +14,8 @@ import {
   Dropdown,
 } from "semantic-ui-react";
 import styled from "styled-components";
-import 'semantic-ui-css/semantic.min.css';
-import { saveAs } from 'file-saver'; // Import file-saver
+import "semantic-ui-css/semantic.min.css";
+import { saveAs } from "file-saver"; // Import file-saver
 
 const StyledContainer = styled(Container)`
   padding: 0;
@@ -81,6 +81,16 @@ const Heading = styled.h1`
   margin-bottom: 10px;
   color: #016da1;
 `;
+const formatChapterId = (chapterId) => {
+  const parts = chapterId.split('_');
+  return `${parts[0].charAt(0).toUpperCase() + parts[0].slice(1)} ${parts[1]}`;
+};
+
+const formatLessonId = (lessonId) => {
+  const parts = lessonId.split('_');
+  return `${parts[0].charAt(0).toUpperCase() + parts[0].slice(1)} ${parts[1]}`;
+};
+
 
 const ViewAllStudents = () => {
   const [students, setStudents] = useState([]);
@@ -94,142 +104,127 @@ const ViewAllStudents = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [studentsPerPage] = useState(10);
   const [classes, setClasses] = useState([]);
- const [sections, setSections] = useState([]);
- const [selectedClass, setSelectedClass] = useState("");
-const [selectedSection, setSelectedSection] = useState("");
+  const [sections, setSections] = useState([]);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
 
-const classOptions = classes.map((cls) => ({
-  key: cls,
-  text: cls,
-  value: cls,
-}));
+  const classOptions = classes.map((cls) => ({
+    key: cls,
+    text: cls,
+    value: cls,
+  }));
 
-const sectionOptions = sections.map((sec) => ({
-  key: sec,
-  text: sec,
-  value: sec,
-}));
+  const sectionOptions = sections.map((sec) => ({
+    key: sec,
+    text: sec,
+    value: sec,
+  }));
 
- useEffect(() => {
-  const fetchStudents = async () => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    const fetchStudents = async () => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const token = localStorage.getItem("token");
-      const instituteKey = sessionStorage.getItem("institutekey");
-      const response = await fetch(
-        `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      try {
+        const token = localStorage.getItem("token");
+        const instituteKey = sessionStorage.getItem("institutekey");
+        const response = await fetch(
+          `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch student details");
         }
-      );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch student details");
-      }
-
-      const data = await response.json();
-      if (!data.studentDetails || !Array.isArray(data.studentDetails)) {
-        throw new Error("No student details found");
-      }
-
-      const formattedStudents = data.studentDetails.map((student) => ({
-        ...student,
-        dob: formatDateOfBirth(student.dob),
-        lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
-      }));
-
-      setStudents(formattedStudents);
-
-      // Extract unique classes and sections
-    
-
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching student details:", error);
-      setError("Failed to fetch student details. Please try again.");
-      setLoading(false);
-    }
-  };
-
-  fetchStudents();
-}, [selectedClass,selectedSection]);
-
-
-useEffect(() => {
-  const fetchAllStudents = async () => {
-    setLoading(true);
-    // setError(null);
-
-    try {
-      const token = localStorage.getItem("token");
-      const instituteKey = sessionStorage.getItem("institutekey");
-      const response = await fetch(
-        `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+        const data = await response.json();
+        if (!data.studentDetails || !Array.isArray(data.studentDetails)) {
+          throw new Error("No student details found");
         }
-      );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch student details");
+        const formattedStudents = data.studentDetails.map((student) => ({
+          ...student,
+          dob: formatDateOfBirth(student.dob),
+          lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
+        }));
+
+        setStudents(formattedStudents);
+
+        // Extract unique classes and sections
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching student details:", error);
+        setError("Failed to fetch student details. Please try again.");
+        setLoading(false);
       }
+    };
 
-      const data = await response.json();
-      if (!data) {
-        throw new Error("No student details found");
+    fetchStudents();
+  }, [selectedClass, selectedSection]);
+
+  useEffect(() => {
+    const fetchAllStudents = async () => {
+      setLoading(true);
+      // setError(null);
+
+      try {
+        const token = localStorage.getItem("token");
+        const instituteKey = sessionStorage.getItem("institutekey");
+        const response = await fetch(
+          `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch student details");
+        }
+
+        const data = await response.json();
+        if (!data) {
+          throw new Error("No student details found");
+        }
+
+        setAllStudents(data);
+        const formattedStudents = data.studentDetails.map((student) => ({
+          ...student,
+          dob: formatDateOfBirth(student.dob),
+          lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
+        }));
+
+        // Extract unique classes and sections
+        const uniqueClasses = [
+          ...new Set(formattedStudents.map((student) => student.class)),
+        ];
+        const uniqueSections = [
+          ...new Set(formattedStudents.map((student) => student.section)),
+        ];
+
+        setClasses(uniqueClasses);
+        setSections(uniqueSections);
+
+        // setLoading(false);
+      } catch (error) {
+        console.error("Error fetching student details:", error);
+        setError("Failed to fetch student details. Please try again.");
+        // setLoading(false);
       }
+    };
 
-      setAllStudents(data);
-      const formattedStudents = data.studentDetails.map((student) => ({
-        ...student,
-        dob: formatDateOfBirth(student.dob),
-        lastLoggedInTime: new Date(student.lastLoggedInTime).toLocaleString(),
-      }));
-
-      // Extract unique classes and sections
-      const uniqueClasses = [
-        ...new Set(formattedStudents.map((student) => student.class)),
-      ];
-      const uniqueSections = [
-        ...new Set(formattedStudents.map((student) => student.section)),
-      ];
-
-      setClasses(uniqueClasses);
-      setSections(uniqueSections);
-
-      // setLoading(false);
-    } catch (error) {
-      console.error("Error fetching student details:", error);
-      setError("Failed to fetch student details. Please try again.");
-      // setLoading(false);
-    }
-  };
-
-  fetchAllStudents();
-}, [selectedClass,selectedSection]);
-
-
-
-
-
-
-
-
-
-
-
-
-
+    fetchAllStudents();
+  }, [selectedClass, selectedSection]);
 
   const handleDelete = async (studentId) => {
     try {
@@ -292,12 +287,11 @@ useEffect(() => {
     closeConfirmationModal();
   };
 
-
   const handleClassChange = (e, { value }) => {
     setSelectedClass(value);
     // Optionally, you can filter students by the selected class here
   };
-  
+
   const handleSectionChange = (e, { value }) => {
     setSelectedSection(value);
     // Optionally, you can filter students by the selected section here
@@ -314,7 +308,7 @@ useEffect(() => {
   //       student.email.toLowerCase().includes(searchTerm.toLowerCase()))
   //   );
   // });
-  
+
   const indexOfLastStudent = currentPage * studentsPerPage;
   const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
   const currentStudents = students.slice(
@@ -326,59 +320,55 @@ useEffect(() => {
     setCurrentPage(data.activePage);
   };
 
-   const handleDownload = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const instituteKey = sessionStorage.getItem("institutekey");
-            const response = await fetch(
-                `http://localhost:3000/user/v1/download?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}&format=csv`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error("Failed to download student details");
-            }
-
-            const blob = await response.blob();
-            saveAs(blob, "student_details.csv");
-            setError('');
-            setSelectedClass('');
-            setSelectedSection('')
-        } catch (error) {
-            console.error("Error downloading student details:", error);
-            setError("Failed to download student details. Please try again.");
+  const handleDownload = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const instituteKey = sessionStorage.getItem("institutekey");
+      const response = await fetch(
+        `http://localhost:3000/user/v1/download?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}&format=csv`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-    };
+      );
 
+      if (!response.ok) {
+        throw new Error("Failed to download student details");
+      }
+
+      const blob = await response.blob();
+      saveAs(blob, "student_details.csv");
+      setError("");
+      setSelectedClass("");
+      setSelectedSection("");
+    } catch (error) {
+      console.error("Error downloading student details:", error);
+      setError("Failed to download student details. Please try again.");
+    }
+  };
 
   return (
     <StyledContainer fluid>
       <Heading>Student Dashboard</Heading>
-      
-     
-      <Dropdown
-  placeholder='Select Class'
- 
-  selection
-  options={classOptions}
-  onChange={handleClassChange}
-/>
-<Dropdown
-  placeholder='Select Section'
- 
-  selection
-  options={sectionOptions}
-  onChange={handleSectionChange}
-/>
 
-<Button onClick={handleDownload} color="green">
-          <Icon name="download" /> Download Student Details
-        </Button>
+      <Dropdown
+        placeholder="Select Class"
+        selection
+        options={classOptions}
+        onChange={handleClassChange}
+      />
+      <Dropdown
+        placeholder="Select Section"
+        selection
+        options={sectionOptions}
+        onChange={handleSectionChange}
+      />
+
+      <Button onClick={handleDownload} color="green">
+        <Icon name="download" /> Download Student Details
+      </Button>
       {loading && (
         <StyledDimmer active inverted>
           <StyledLoader size="large">Loading...</StyledLoader>
@@ -407,13 +397,15 @@ useEffect(() => {
                 <Table.HeaderCell>Institute Name</Table.HeaderCell>
                 <Table.HeaderCell>Password</Table.HeaderCell>
                 <Table.HeaderCell>Last Login</Table.HeaderCell>
+                <Table.HeaderCell></Table.HeaderCell>
+
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {currentStudents.map((student, index) => (
                 <Table.Row
                   key={student._id}
-                  onClick={() => handleRowClick(student)}
+                  onDoubleClick={() => handleRowClick(student)}
                 >
                   <Table.Cell>{indexOfFirstStudent + index + 1}</Table.Cell>
                   <Table.Cell>{student.name}</Table.Cell>
@@ -427,6 +419,13 @@ useEffect(() => {
                   <Table.Cell>{student.instituteName}</Table.Cell>
                   <Table.Cell>{student.password}</Table.Cell>
                   <Table.Cell>{student.lastLoggedInTime}</Table.Cell>
+                  <Table.Cell>
+                    <Icon
+                      name="eye"
+                      link
+                      onClick={() => handleRowClick(student)}
+                    />
+                  </Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
@@ -468,11 +467,7 @@ useEffect(() => {
                     color: "black", // Change icon color to black
                   }}
                 />
-                <Image
-                  wrapped
-                  size="medium"
-                  src={selectedStudent.imageUrl}
-                />
+                <Image wrapped size="medium" src={selectedStudent.imageUrl} />
                 <StyledTable celled striped>
                   <Table.Header>
                     <Table.Row>
@@ -485,11 +480,11 @@ useEffect(() => {
                   <Table.Body>
                     {selectedStudent.completedChapters.map((chapter) => (
                       <Table.Row key={chapter._id}>
-                        <Table.Cell>{chapter.chapter_id}</Table.Cell>
+                        <Table.Cell>{formatChapterId(chapter.chapter_id)}</Table.Cell>
                         <Table.Cell>
                           <ul>
                             {chapter.completedLessons.map((lesson) => (
-                              <li key={lesson._id}>{lesson.lesson_id}</li>
+                              <li key={lesson._id}>{formatLessonId(lesson.lesson_id)}</li>
                             ))}
                           </ul>
                         </Table.Cell>

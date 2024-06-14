@@ -11,7 +11,7 @@ import SuperAdmin from "./components/SuperAdmin";
 import Instituteadmin from "./components/InstituteAdmin";
 import StudentHome from "./components/StudentHome";
 import HomePage from "./components/HomePage";
-import Demo from "./components/demo";
+
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
         <Route path="/superadmin" Component={SuperAdmin}></Route>
         <Route path="/instituteadmin" Component={Instituteadmin}></Route>
         <Route path="/student" Component={StudentHome}></Route>
-        <Route path="/demo" Component={Demo}></Route>
+ 
        
       </Routes>
     </Router>
