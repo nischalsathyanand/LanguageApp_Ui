@@ -19,8 +19,8 @@ const divideQuestions = (questions, partSize) => {
   return parts;
 };
 
-const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId, username,setModalOpen  }) => {
-
+const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId, username,setModalOpen,  selectedChapterName,selectedLessonName }) => {
+  
   const { questions, selectedLesson, score, completedTime} = questionSessionStore;
   const PART_SIZE = 4;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -101,6 +101,7 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
         width: "100%",
         margin: 0,
         height: "auto",
+        minHight:'100vh',
         boxSizing: "border-box",
         padding: "20px",
         margin: "0px",
@@ -170,6 +171,8 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
     selectedChapterId={selectedChapterId}
     username={username}
     completedTime={formattedTime} 
+    selectedChapterName={selectedChapterName}
+    selectedLessonName={selectedLessonName}
 
   />
 )}

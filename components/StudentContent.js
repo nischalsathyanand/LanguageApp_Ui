@@ -23,6 +23,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedChapterName, setSelectedChapterName] = useState('');
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -54,8 +55,9 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
     fetchChapters();
   }, [selectedLanguage]);
 
-  const handleLessonClick = (lesson, chapterId) => {
+  const handleLessonClick = (lesson, chapterId,chapterName) => {
     setSelectedLesson({ ...lesson, chapterId });
+    setSelectedChapterName(chapterName);
     setPopupOpen(true);
   };
 
@@ -79,7 +81,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
     }
   };
 
-  const renderLessons = (lessons, chapterId, color) => {
+  const renderLessons = (lessons, chapterId,chapterName, color) => {
     if (!lessons || lessons.length === 0) {
       return <p style={{ color: '#999' }}>No lessons found for this chapter.</p>;
     }
@@ -165,7 +167,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
                       left: `${buttonX}px`,
                       top: `${buttonY}px`,
                     }}
-                    onClick={() => handleLessonClick(lesson, chapterId)}
+                    onClick={() => handleLessonClick(lesson, chapterId,chapterName)}
                   >
                     <Icon name='check large' style={{ color: 'white' }} />
                   </button>
@@ -224,7 +226,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
               >
                 {chapter.name}
               </div>
-              {renderLessons(chapter.lessons, chapter._id, getColorForChapter(index))}
+              {renderLessons(chapter.lessons, chapter._id,chapter.name, getColorForChapter(index))}
             </div>
           ))}
 
@@ -258,6 +260,8 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
                 questionSessionStore={questionSessionStore}
                 selectedLessonId={selectedLesson?._id}
                 selectedChapterId={selectedLesson?.chapterId}
+                selectedChapterName={selectedChapterName}
+                selectedLessonName={selectedLesson?.name}
                 username={username}
                 setModalOpen={setModalOpen}
               />
@@ -271,4 +275,3 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
 });
 
 export default StudentContent;
-
