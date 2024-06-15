@@ -29,6 +29,7 @@ const LoginPage = () => {
       sessionStorage.setItem('username', userInfo.username);
       sessionStorage.setItem('institutekey', userInfo.instituteKey); 
       sessionStorage.setItem('name', userInfo.name); 
+      sessionStorage.setItem('role', userInfo.role); // Ensure role is stored
 
       if (userInfo.role === 'superadmin') {
         navigate('/superadmin');
