@@ -43,7 +43,7 @@ const HomePage = () => {
       padding: '15px 30px',
       fontSize: '1.2em',
       cursor: 'pointer',
-      borderRadius: '5px',
+      borderRadius: '0px',
       transition: 'background-color 0.3s',
     },
     getStartedButtonHover: {
