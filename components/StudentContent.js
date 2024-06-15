@@ -16,8 +16,7 @@ const colorPalette = {
 
 const getColorForChapter = (index) => colorPalette[index % Object.keys(colorPalette).length];
 
-const StudentContent = observer(({ selectedLanguage,username }) => {
-  
+const StudentContent = observer(({ selectedLanguage, username }) => {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -25,6 +24,7 @@ const StudentContent = observer(({ selectedLanguage,username }) => {
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeChapter, setActiveChapter] = useState(0);
+  const [selectedChapterName, setSelectedChapterName] = useState('');
   const contextRef = useRef();
   const headersRef = useRef([]);
   const stickyHeaderRef = useRef(null);
@@ -76,8 +76,9 @@ const StudentContent = observer(({ selectedLanguage,username }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLessonClick = (lesson, chapterId) => {
+  const handleLessonClick = (lesson, chapterId, chapterName) => {
     setSelectedLesson({ ...lesson, chapterId });
+    setSelectedChapterName(chapterName);
     setPopupOpen(true);
   };
 
@@ -101,7 +102,7 @@ const StudentContent = observer(({ selectedLanguage,username }) => {
     }
   };
 
-  const renderLessons = (lessons, chapterId, color) => {
+  const renderLessons = (lessons, chapterId, color, chapterName) => {
     if (!lessons || lessons.length === 0) {
       return <p style={{ color: '#999' }}>No lessons found for this chapter.</p>;
     }
@@ -133,7 +134,7 @@ const StudentContent = observer(({ selectedLanguage,username }) => {
               <Button 
                 circular 
                 style={{ margin: '0.5em', width: '60px', height: '60px', backgroundColor: color, border: 'none', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' }}
-                onClick={() => handleLessonClick(lesson, chapterId)}
+                onClick={() => handleLessonClick(lesson, chapterId, chapterName)}
               >
                 <Icon name='star' style={{ color: 'white' }} />
               </Button>
@@ -198,7 +199,7 @@ const StudentContent = observer(({ selectedLanguage,username }) => {
                     }}
                   ></div>
                 )}
-                {renderLessons(chapter.lessons, chapter._id, chapterColor)}
+                {renderLessons(chapter.lessons, chapter._id, chapterColor, chapter.name)}
               </div>
             );
           })}
@@ -230,15 +231,15 @@ const StudentContent = observer(({ selectedLanguage,username }) => {
           </div>
         </Modal.Header>
         <Modal.Content>
-        <TrainingAndAssessmentContainer
+          <TrainingAndAssessmentContainer
             questionSessionStore={questionSessionStore}
             selectedLessonId={selectedLesson?._id}
             selectedChapterId={selectedLesson?.chapterId}
+            selectedChapterName={selectedChapterName}
+            selectedLessonName={selectedLesson?.name}
             username={username}
             setModalOpen={setModalOpen}
           />
-        
-
         </Modal.Content>
       </Modal>
     </Container>

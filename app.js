@@ -1,30 +1,45 @@
-
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
-import React from "react";
-import LoginPage from "./components/loginPage";
-import SuperAdmin from "./components/SuperAdmin";
-import Instituteadmin from "./components/InstituteAdmin";
-import StudentHome from "./components/StudentHome";
-import HomePage from "./components/HomePage";
-import Demo from "./components/demo";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import LoginPage from './components/LoginPage';
+import SuperAdmin from './components/SuperAdmin';
+import InstituteAdmin from './components/InstituteAdmin';
+import StudentHome from './components/StudentHome';
+import HomePage from './components/HomePage';
+import Unauthorized from './Unauthorized';
+import ProtectedRoute from './utils/ProtectedRoute';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/home" />}></Route>
-        <Route path="/home" Component={HomePage}></Route>
-        <Route path="/login" Component={LoginPage}></Route>
-        <Route path="/superadmin" Component={SuperAdmin}></Route>
-        <Route path="/instituteadmin" Component={Instituteadmin}></Route>
-        <Route path="/student" Component={StudentHome}></Route>
-        <Route path="/demo" Component={Demo}></Route>
-       
+        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route 
+          path="/superadmin" 
+          element={
+            <ProtectedRoute role="superadmin">
+              <SuperAdmin />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/instituteadmin" 
+          element={
+            <ProtectedRoute role="instituteadmin">
+              <InstituteAdmin />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/student" 
+          element={
+            <ProtectedRoute role="student">
+              <StudentHome />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
     </Router>
   );
