@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Container, Header, Button, Loader, Icon, Popup, Modal, Sticky, Message } from 'semantic-ui-react';
+import React, { useEffect, useState } from 'react';
+import { Container, Header, Loader, Icon, Popup, Modal, Message } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
-import { questionSessionStore } from '../store/questionSessionStore'; // Import the MobX store
+import { questionSessionStore } from '../store/questionSessionStore';
 import TrainingAndAssessmentContainer from './TrainingAndAssessmentContainer';
 import 'semantic-ui-css/semantic.min.css';
 
@@ -23,11 +23,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [activeChapter, setActiveChapter] = useState(0);
   const [selectedChapterName, setSelectedChapterName] = useState('');
-  const contextRef = useRef();
-  const headersRef = useRef([]);
-  const stickyHeaderRef = useRef(null);
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -59,24 +55,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
     fetchChapters();
   }, [selectedLanguage]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + (stickyHeaderRef.current?.offsetHeight || 0) + 20; // Added 20px offset for extra spacing
-      for (let i = 0; i < headersRef.current.length; i++) {
-        const headerTop = headersRef.current[i]?.getBoundingClientRect().top + window.scrollY - (stickyHeaderRef.current?.offsetHeight || 0);
-        const headerBottom = headersRef.current[i + 1]?.getBoundingClientRect().top + window.scrollY - (stickyHeaderRef.current?.offsetHeight || 0) || Number.POSITIVE_INFINITY;
-        if (scrollPosition >= headerTop && scrollPosition < headerBottom) {
-          setActiveChapter(i);
-          break;
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleLessonClick = (lesson, chapterId, chapterName) => {
+  const handleLessonClick = (lesson, chapterId,chapterName) => {
     setSelectedLesson({ ...lesson, chapterId });
     setSelectedChapterName(chapterName);
     setPopupOpen(true);
@@ -102,51 +81,119 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
     }
   };
 
-  const renderLessons = (lessons, chapterId, color, chapterName) => {
+  const renderLessons = (lessons, chapterId,chapterName, color) => {
     if (!lessons || lessons.length === 0) {
       return <p style={{ color: '#999' }}>No lessons found for this chapter.</p>;
     }
 
+    const centerX = 150; // Center X for the curved path
+    const startY = 50; // Start Y position for the first button
+    const yStep = 90; // Vertical distance between buttons
+    const xCurve = 60; // Increase the horizontal curvature factor
+    const containerHeight = startY + (lessons.length - 1) * yStep + 100; // Dynamically calculate the container height
+
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '1em' }}>
-        {lessons.map((lesson) => (
-          <Popup
-            key={lesson._id}
-            open={popupOpen && selectedLesson?._id === lesson._id}
-            onClose={() => setPopupOpen(false)}
-            closeOnTriggerMouseLeave={false}
-            position='bottom center'
-            content={(
-              <div style={{ backgroundColor: color, padding: '2em', borderRadius: '10px', textAlign: 'center', width: '300px' }}>
-                <div style={{ color: 'white', fontSize: '1.5em', fontWeight: 'bold', marginBottom: '1em' }}>
-                  {lesson.name}
-                </div>
-                <Button 
-                  color='green' 
-                  onClick={handleStartClick} 
-                  style={{ padding: '0.8em 2em', fontSize: '1em', backgroundColor: 'white', color: '#21ba45' }}
-                >
-                  Start
-                </Button>
-              </div>
-            )}
-            trigger={
-              <Button 
-                circular 
-                style={{ margin: '0.5em', width: '60px', height: '60px', backgroundColor: color, border: 'none', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)' }}
-                onClick={() => handleLessonClick(lesson, chapterId, chapterName)}
-              >
-                <Icon name='star' style={{ color: 'white' }} />
-              </Button>
-            }
-          />
-        ))}
+      <div className="lessons-container-outer" style={{ width: '300px', margin: 'auto', zIndex: '1' }}>
+        <div className="lessons-container-inner" style={{ position: 'relative', height: `${containerHeight}px` }}>
+          {lessons.map((lesson, index) => {
+            const buttonY = startY + index * yStep;
+            const buttonX = centerX + Math.sin(index * 1) * xCurve; // Increase the frequency of the sine function
+
+            return (
+              <Popup
+                key={lesson._id}
+                open={popupOpen && selectedLesson?._id === lesson._id}
+                onClose={() => setPopupOpen(false)}
+                closeOnTriggerMouseLeave={false}
+                position='bottom center'
+                content={(
+                  <div style={{
+                    backgroundColor: color,
+                    padding: '2em',
+                    borderRadius: '10px',
+                    textAlign: 'center',
+                    width: '300px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1000, // Add z-index to ensure the popup is above other elements
+                  }}>
+                    <div style={{
+                      color: 'white',
+                      fontSize: '1.5em',
+                      fontWeight: 'bold',
+                      marginBottom: '1em'
+                    }}>
+                      {lesson.name}
+                    </div>
+                    <button
+                      style={{
+                        padding: '0.8em 2em',
+                        fontSize: '1em',
+                        backgroundColor: 'white',
+                        color: color,
+                        width: '70%',
+                        height: '40%',
+                        borderRadius: '15px',
+                        border: 'none',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Default box shadow
+                        transition: 'box-shadow 0.3s ease', // Transition for smooth animation
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.4)'} // Hover box shadow
+                      onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'} // Revert to default on leave
+                      onClick={handleStartClick}
+                    >
+                      Start
+                    </button>
+                  </div>
+                )}
+                trigger={
+                  <button
+                    className={`lesson-button lesson-button-${index}`}
+                    style={{
+                      backgroundColor: '#d6d327',
+                      width: '70px',
+                      height: '70px',
+                      border: 'none',
+                      boxShadow: '0 4px 8px rgba(55, 70, 0, 2)',
+                      borderRadius: '50%',
+                      position: 'absolute',
+                      cursor: 'pointer',
+                      left: `${buttonX}px`,
+                      top: `${buttonY}px`,
+                    }}
+                    onClick={() => handleLessonClick(lesson, chapterId,chapterName)}
+                  >
+                    <Icon name='check large' style={{ color: 'white' }} />
+                  </button>
+                }
+              />
+            );
+          })}
+        </div>
       </div>
     );
   };
 
+  // Add scroll event listener and clean up on unmount
+  useEffect(() => {
+    const handleScroll = () => {
+      setPopupOpen(false);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <Container style={{ marginTop: '2em', padding: '2em' }}>
+    <Container style={{ marginTop: '0em', padding: '2em' }}>
       {loading ? (
         <Loader active inline='centered' />
       ) : error ? (
@@ -155,93 +202,74 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
           <p>{error}</p>
         </Message>
       ) : (
-        <div ref={contextRef}>
-          <Sticky context={contextRef} offset={100}>
-            <div
-              ref={stickyHeaderRef}
-              style={{
-                backgroundColor: getColorForChapter(activeChapter),
-                padding: '1em',
-                borderRadius: '10px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '2em', // Adjusted for more space below the header
-                zIndex: 1000, // Ensure the sticky header stays on top
-              }}
-            >
-              <Icon name='arrow left' style={{ color: 'white', cursor: 'pointer' }} />
-              <Header
-                as='h1'
-                style={{ color: 'white', margin: '0', textAlign: 'center', padding: '0.5em 0' }}
-              >
-                {chapters[activeChapter]?.name}
-              </Header>
-              <Icon name='ellipsis vertical' style={{ color: 'white' }} />
-            </div>
-          </Sticky>
-          {chapters.map((chapter, index) => {
-            const chapterColor = getColorForChapter(index);
-            return (
+        <div>
+          {chapters.map((chapter, index) => (
+            <div key={chapter._id} style={{ marginBottom: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
               <div
-                key={chapter._id}
-                ref={(el) => (headersRef.current[index] = el)}
-                style={{ marginBottom: '3em' }} // Increased marginBottom between chapters for better spacing
+                as='h2'
+                style={{
+                  backgroundColor: getColorForChapter(index), // Random color for each chapter
+                  color: 'white', // White text color for contrast
+                  textAlign: 'center',
+                  marginBottom: '0em',
+                  padding: '0.5em',
+                  width: '70%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  minHeight: '80px',
+                  borderRadius: '15px',
+                  fontSize: '20px',
+                  fontFamily: 'timesNewRoman',
+                  fontWeight: '600'
+                }}
               >
-                {index === 0 ? null : (
-                  <div
-                    style={{
-                      height: '2px',
-                      backgroundColor: chapterColor,
-                      marginBottom: '2em', // Adjusted marginBottom for more space
-                      marginTop: '2em'    // Added marginTop for gap
-                    }}
-                  ></div>
-                )}
-                {renderLessons(chapter.lessons, chapter._id, chapterColor, chapter.name)}
+                {chapter.name}
               </div>
-            );
-          })}
+              {renderLessons(chapter.lessons, chapter._id,chapter.name, getColorForChapter(index))}
+            </div>
+          ))}
+
+          <Modal
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: 'auto',
+              margin: 0,
+              backgroundColor: 'white',
+            }}
+          >
+            <Modal.Header>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Icon
+                  size='large'
+                  name='close'
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setModalOpen(false)}
+                />
+
+                <div></div>
+              </div>
+            </Modal.Header>
+            <Modal.Content>
+              <TrainingAndAssessmentContainer
+                questionSessionStore={questionSessionStore}
+                selectedLessonId={selectedLesson?._id}
+                selectedChapterId={selectedLesson?.chapterId}
+                selectedChapterName={selectedChapterName}
+                selectedLessonName={selectedLesson?.name}
+                username={username}
+                setModalOpen={setModalOpen}
+              />
+
+            </Modal.Content>
+          </Modal>
         </div>
       )}
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          margin: 0,
-          backgroundColor: 'white',
-        }}
-      >
-        <Modal.Header>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Icon
-              size='large'
-              name='close'
-              style={{ cursor: 'pointer' }}
-              onClick={() => setModalOpen(false)}
-            />
-           
-            <div></div>
-          </div>
-        </Modal.Header>
-        <Modal.Content>
-          <TrainingAndAssessmentContainer
-            questionSessionStore={questionSessionStore}
-            selectedLessonId={selectedLesson?._id}
-            selectedChapterId={selectedLesson?.chapterId}
-            selectedChapterName={selectedChapterName}
-            selectedLessonName={selectedLesson?.name}
-            username={username}
-            setModalOpen={setModalOpen}
-          />
-        </Modal.Content>
-      </Modal>
     </Container>
   );
 });

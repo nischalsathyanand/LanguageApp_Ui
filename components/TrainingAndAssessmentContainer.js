@@ -100,8 +100,10 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
         boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
         width: "100%",
         margin: 0,
-        height: "100vh",
-        padding: "0px",
+        height: "auto",
+        minHight:'100vh',
+        boxSizing: "border-box",
+        padding: "20px",
         margin: "0px",
       }}
     >

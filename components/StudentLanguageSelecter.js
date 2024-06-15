@@ -9,9 +9,9 @@ const StudentLanguageSelecter = ({ languages, languageCodeMap, handleLanguageCha
 
   return (
     <div style={{ padding: "2em" }}>
-      <Header as="h2" style={{ marginBottom: "1em" }}>
+      {/* <Header as="h2" style={{ marginBottom: "1em" }}>
         Languages I need to learn
-      </Header>
+      </Header> */}
       <Card.Group itemsPerRow={4}>
         {languages.map((language) => (
           <Card key={language._id} onClick={() => handleCardClick(language)}>
