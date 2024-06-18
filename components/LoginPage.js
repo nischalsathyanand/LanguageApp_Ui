@@ -24,12 +24,15 @@ const LoginPage = () => {
       }
 
       const { token, userInfo } = await response.json();
+      console.log(userInfo)
+  
   
       localStorage.setItem('token', token);
       sessionStorage.setItem('username', userInfo.username);
       sessionStorage.setItem('institutekey', userInfo.instituteKey); 
       sessionStorage.setItem('name', userInfo.name); 
       sessionStorage.setItem('role', userInfo.role); // Ensure role is stored
+     sessionStorage.setItem('language',userInfo.language);
 
       if (userInfo.role === 'superadmin') {
         navigate('/superadmin');

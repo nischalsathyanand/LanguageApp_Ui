@@ -6,7 +6,8 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
         username: '',
         password: '',
         instituteKey: '',
-        instituteName: ''
+        instituteName: '',
+        language: '' // Added language field
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -39,7 +40,7 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
             }
 
             setSuccess(true);
-            setFormData({ username: '', password: '', instituteKey: '', instituteName: '' });
+            setFormData({ username: '', password: '', instituteKey: '', instituteName: '', language: '' }); // Reset form including language
         } catch (err) {
             setError(err.message);
         } finally {
@@ -83,6 +84,14 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
                     label="Institute Name"
                     name="instituteName"
                     value={formData.instituteName}
+                    onChange={handleChange}
+                    required
+                    style={{ borderRadius: '5px' }}
+                />
+                <Form.Input
+                    label="Language" // Added language input
+                    name="language"
+                    value={formData.language}
                     onChange={handleChange}
                     required
                     style={{ borderRadius: '5px' }}

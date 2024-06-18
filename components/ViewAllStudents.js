@@ -396,6 +396,7 @@ const ViewAllStudents = () => {
                 <Table.HeaderCell>RollNo</Table.HeaderCell>
                 <Table.HeaderCell>Institute Name</Table.HeaderCell>
                 <Table.HeaderCell>Password</Table.HeaderCell>
+                <Table.HeaderCell>Language</Table.HeaderCell>
                 <Table.HeaderCell>Last Login</Table.HeaderCell>
                 <Table.HeaderCell></Table.HeaderCell>
 
@@ -418,6 +419,7 @@ const ViewAllStudents = () => {
                   <Table.Cell>{student.rollno}</Table.Cell>
                   <Table.Cell>{student.instituteName}</Table.Cell>
                   <Table.Cell>{student.password}</Table.Cell>
+                  <Table.Cell>{student.language}</Table.Cell>
                   <Table.Cell>{student.lastLoggedInTime}</Table.Cell>
                   <Table.Cell>
                     <Icon
@@ -480,11 +482,11 @@ const ViewAllStudents = () => {
                   <Table.Body>
                     {selectedStudent.completedChapters.map((chapter) => (
                       <Table.Row key={chapter._id}>
-                        <Table.Cell>{formatChapterId(chapter.chapter_id)}</Table.Cell>
+                        <Table.Cell>{formatChapterId(chapter.chapter_name)}</Table.Cell>
                         <Table.Cell>
                           <ul>
                             {chapter.completedLessons.map((lesson) => (
-                              <li key={lesson._id}>{formatLessonId(lesson.lesson_id)}</li>
+                              <li key={lesson._id}>{formatLessonId(lesson.lesson_name)}</li>
                             ))}
                           </ul>
                         </Table.Cell>

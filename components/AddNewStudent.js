@@ -46,9 +46,7 @@ const AddNewStudent = () => {
         if (validator.isEmpty(formData.Roll_No)) {
             errors.Roll_No = 'Roll_No is required';
         }
-        if (validator.isEmpty(formData.Language)) {
-            errors.Language = 'Language is required';
-        }
+       
         return errors;
     };
 
@@ -91,8 +89,7 @@ const AddNewStudent = () => {
                 Class: '',
                 Section: '',
                 DOB: '',
-                Roll_No: '',
-                Language: '',
+                Roll_No: ''
             });
         } catch (error) {
             console.error('Error adding student:', error);
@@ -174,15 +171,7 @@ const AddNewStudent = () => {
                                     error={formErrors.Roll_No ? { content: formErrors.Roll_No } : null}
                                     required
                                 />
-                                <Form.Input
-                                    label='Language'
-                                    placeholder='Language'
-                                    name='Language'
-                                    value={formData.Language}
-                                    onChange={handleChange}
-                                    error={formErrors.Language ? { content: formErrors.Language } : null}
-                                    required
-                                />
+                               
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>

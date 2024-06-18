@@ -6,12 +6,10 @@ import TrainingAndAssessmentContainer from './TrainingAndAssessmentContainer';
 import 'semantic-ui-css/semantic.min.css';
 
 const colorPalette = {
-  0: "#1CB0F6",
+  0: "#CE82FF",
   1: "#00CD9C",
-  2: "#FF4B4B",
-  3: "#FF9600",
-  4: "#FF86D0",
-  5: "#CE82FF"
+  2: "#58CC02",
+
 };
 
 const getColorForChapter = (index) => colorPalette[index % Object.keys(colorPalette).length];
@@ -24,6 +22,23 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedChapterName, setSelectedChapterName] = useState('');
+  const [completedLessons,setCompletedLessons]=useState([]);
+
+  useEffect(() => {
+    const fetchCompletedLessons = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/user/${username}/completedChapters`);
+        if (!response.ok) throw new Error('Failed to fetch completed lessons');
+        const data = await response.json();
+        setCompletedLessons(data);
+      } catch (error) {
+        console.error('Error fetching completed lessons:', error);
+        setError(error.message);
+      }
+    };
+
+    fetchCompletedLessons();
+  }, [username]);
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -80,7 +95,30 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
       }
     }
   };
+  const renderLessonIcons = (lessonId, chapterId) => {
+  
+    let isCompleted = false;
+  
+    // Iterate through chapters to find the matching chapterId
+    completedLessons.forEach(chapter => {
 
+ 
+    
+      if (chapter.chapter_id === chapterId) {
+    
+        // Check if lessonId exists in the completedLessons array of the current chapter
+        isCompleted = chapter.completedLessons.some(lesson => lesson.lesson_id === lessonId);
+        return; // Exit loop once found
+      }
+      else{
+        isCompleted === false;
+      }
+    });
+
+  
+    return isCompleted ? <Icon name='check' style={{ color: 'dimgray' }} /> : <Icon name='star' style={{ color: 'white' }} />;
+  };
+  
   const renderLessons = (lessons, chapterId,chapterName, color) => {
     if (!lessons || lessons.length === 0) {
       return <p style={{ color: '#999' }}>No lessons found for this chapter.</p>;
@@ -169,7 +207,8 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
                     }}
                     onClick={() => handleLessonClick(lesson, chapterId,chapterName)}
                   >
-                    <Icon name='check large' style={{ color: 'white' }} />
+                    {/* <Icon name='check large' style={{ color: 'white' }} /> */}
+                    {renderLessonIcons(lesson._id,chapterId)}
                   </button>
                 }
               />

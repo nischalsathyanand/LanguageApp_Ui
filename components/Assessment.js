@@ -47,8 +47,8 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
       } else {
         if (isLastPart) {
          
-          await updateCompletedChapters(username, selectedChapterName,selectedLessonName, questionSessionStore.score, completedTime);
-          //console.log(completedTime)
+          await updateCompletedChapters(username, selectedChapterName,selectedChapterId,selectedLessonName,selectedLessonId, questionSessionStore.score, completedTime);
+          console.log(updateCompletedChapters)
         }
         handleNext();
       }
@@ -72,7 +72,7 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
     return `http://localhost:3000/aws/data/${audioPath}${fileName}`;
   };
 
-  const updateCompletedChapters = async (username, chapter_id, lesson_id, score,completedTime ) => {
+  const updateCompletedChapters = async (username,chapter_name, chapter_id, lesson_name,lesson_id, score,completedTime ) => {
     try {
    
       const response = await fetch(`http://localhost:3000/user/${username}/completedChapters`, {
@@ -80,7 +80,7 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ chapter_id, lesson_id, score, completedTime }),
+        body: JSON.stringify({ chapter_name,chapter_id, lesson_name,lesson_id, score, completedTime }),
       });
   
       if (!response.ok) {
