@@ -3,14 +3,8 @@ import {
   Grid,
   Button,
   Header,
-  Step,
-  StepContent,
-  StepGroup,
   Icon,
   Menu,
-  Dropdown,
-  DropdownMenu,
-  DropdownItem,
   Loader,
   Flag,
 } from "semantic-ui-react";
@@ -79,9 +73,9 @@ const StudentHome = () => {
   };
 
   return (
-
     <Grid celled stackable style={{ minHeight: "100vh", margin: '0px', padding: '0px', position: 'relative', borderRadius: '0px' }}>
       <Grid.Row centered style={{ borderRadius: '0px' }}>
+        {/* Left Sidebar */}
         {/* Left Sidebar */}
         <Grid.Column width={3} computer={3} tablet={4} mobile={16} style={{
           position: "relative",
@@ -203,7 +197,6 @@ const StudentHome = () => {
 
           </div>
         </Grid.Column>
-
         {/* Main Content */}
         <Grid.Column
           width={13}
@@ -221,7 +214,6 @@ const StudentHome = () => {
               color: "white",
               display: "flex",
               alignItems: "center",
-              // padding: "0 1em",
               zIndex: 1000,
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               position: 'sticky',
@@ -231,54 +223,27 @@ const StudentHome = () => {
             {loadingLanguages ? (
               <Loader active inline="centered" size="small" />
             ) : (
-              <Dropdown
-                item
-                text={
-                  selectedLanguage ? (
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <Flag
-                        name={languageCodeMap[selectedLanguage.name]}
-                        style={{ marginRight: "10px", fontSize: "2rem" }}
-                      />
-                      <span style={{ fontSize: "1.4rem" }}>
-                        {selectedLanguage.name}
-                      </span>
-                    </div>
-                  ) : (
-                    "Languages"
-                  )
-                }
-                style={{ color: "white", fontSize: "1.4rem" }}
+              <div
+                onClick={() => setSelectedLanguage(null)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  marginRight: "10px",
+                }}
               >
-                <DropdownMenu style={{ fontSize: "1.4rem" }}>
-                  {languages.map((language) => (
-                    <DropdownItem
-                      key={language._id}
-                      onClick={() => handleLanguageChange(language)}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        fontSize: "1.4rem",
-                        padding: "0.5em 1em",
-                      }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <Flag
-                          name={languageCodeMap[language.name]}
-                          style={{ marginRight: "10px", fontSize: "2rem" }}
-                        />
-                        {language.name}
-                      </div>
-                      <Icon
-                        name="unlock alternate"
-                        color="green"
-                        style={{ marginLeft: "5px" }}
-                      />
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
+                {selectedLanguage && (
+                  <>
+                    <Flag
+                      name={languageCodeMap[selectedLanguage.name]}
+                      style={{ marginRight: "10px", fontSize: "2rem" }}
+                    />
+                    {/* <span style={{ fontSize: "1.4rem" }}>
+                      {selectedLanguage.name}
+                    </span> */}
+                  </>
+                )}
+              </div>
             )}
             <Menu.Menu
               position="right"
@@ -310,7 +275,7 @@ const StudentHome = () => {
             </Menu.Menu>
           </Menu>
 
-          <div style={{ marginTop: "0px" }}>
+          <div style={{ marginTop: "50px" }}>
             {selectedLanguage ? (
               <StudentContent selectedLanguage={selectedLanguage} username={username} />
             ) : (

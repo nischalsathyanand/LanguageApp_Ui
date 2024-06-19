@@ -23,22 +23,23 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedChapterName, setSelectedChapterName] = useState('');
   const [completedLessons,setCompletedLessons]=useState([]);
+  const[lessonCompleted,setLessonCompleted]=useState([]);
+
+  const fetchCompletedLessons = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/user/${username}/completedChapters`);
+      if (!response.ok) throw new Error('Failed to fetch completed lessons');
+      const data = await response.json();
+      setCompletedLessons(data);
+    } catch (error) {
+      console.error('Error fetching completed lessons:', error);
+      setError(error.message);
+    }
+  };
 
   useEffect(() => {
-    const fetchCompletedLessons = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/user/${username}/completedChapters`);
-        if (!response.ok) throw new Error('Failed to fetch completed lessons');
-        const data = await response.json();
-        setCompletedLessons(data);
-      } catch (error) {
-        console.error('Error fetching completed lessons:', error);
-        setError(error.message);
-      }
-    };
-
     fetchCompletedLessons();
-  }, [username]);
+  }, [username, lessonCompleted]); 
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -303,6 +304,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
                 selectedLessonName={selectedLesson?.name}
                 username={username}
                 setModalOpen={setModalOpen}
+                onLessonComplete={() => setLessonCompleted(!lessonCompleted)}
               />
 
             </Modal.Content>

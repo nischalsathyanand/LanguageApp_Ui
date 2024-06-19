@@ -19,7 +19,7 @@ const divideQuestions = (questions, partSize) => {
   return parts;
 };
 
-const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId, username,setModalOpen,  selectedChapterName,selectedLessonName }) => {
+const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedChapterId, username,setModalOpen,  selectedChapterName,selectedLessonName,onLessonComplete }) => {
   
   const { questions, selectedLesson, score, completedTime} = questionSessionStore;
   const PART_SIZE = 4;
@@ -63,6 +63,8 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
        
         setShowConfetti(true);
         clearInterval(timerInterval);
+        onLessonComplete();
+
         setTimeout(() => {
           navigate("/student");
         }, 4000);
@@ -173,6 +175,8 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
     completedTime={formattedTime} 
     selectedChapterName={selectedChapterName}
     selectedLessonName={selectedLessonName}
+ 
+
 
   />
 )}

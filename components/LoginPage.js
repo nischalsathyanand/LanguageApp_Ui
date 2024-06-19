@@ -32,7 +32,8 @@ const LoginPage = () => {
       sessionStorage.setItem('institutekey', userInfo.instituteKey); 
       sessionStorage.setItem('name', userInfo.name); 
       sessionStorage.setItem('role', userInfo.role); // Ensure role is stored
-     sessionStorage.setItem('language',userInfo.language);
+     // Assuming userInfo.allowedLanguages is an array of language names like ['English', 'German']
+sessionStorage.setItem('languages', JSON.stringify(userInfo.allowedLanguages));
 
       if (userInfo.role === 'superadmin') {
         navigate('/superadmin');

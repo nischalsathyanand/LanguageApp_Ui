@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Form, Button, Segment, Header, Message, Grid, Icon } from 'semantic-ui-react';
+import React, { useState, useEffect } from 'react';
+import { Form, Button, Segment, Header, Message, Grid, Icon, Dropdown } from 'semantic-ui-react';
 
 const AddInstituteAdmin = ({ setActiveStep }) => {
     const [formData, setFormData] = useState({
@@ -7,14 +7,38 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
         password: '',
         instituteKey: '',
         instituteName: '',
-        language: '' // Added language field
+        allowedLanguages: []
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [availableLanguages, setAvailableLanguages] = useState([]);
+    const [loadingLanguages, setLoadingLanguages] = useState(true);
+
+    useEffect(() => {
+        // Fetch available languages
+        const fetchLanguages = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/api/v1/languages");
+                const data = await response.json();
+                setAvailableLanguages(data.map(lang => ({ key: lang._id, text: lang.name, value: lang.name })));
+            } catch (error) {
+                console.error("Error fetching languages:", error);
+                setError('Error fetching languages');
+            } finally {
+                setLoadingLanguages(false);
+            }
+        };
+
+        fetchLanguages();
+    }, []);
 
     const handleChange = (e, { name, value }) => {
         setFormData({ ...formData, [name]: value });
+    };
+
+    const handleLanguageChange = (e, { value }) => {
+        setFormData({ ...formData, allowedLanguages: value });
     };
 
     const handleSubmit = async () => {
@@ -25,22 +49,46 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
         const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
 
         try {
-            const response = await fetch('http://localhost:3000/user/v1/addInstituteAdmin', {
+            // First, create the institute
+            const response = await fetch('http://localhost:3000/user/v1/create-institute', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}` // Add the token to the headers
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({
+                    instituteName: formData.instituteName,
+                    instituteKey: formData.instituteKey,
+                    allowedLanguages: formData.allowedLanguages
+                })
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Error adding institute admin');
+                throw new Error(errorData.message || 'Error creating institute');
+            }
+
+            // Now, add the admin
+            const adminResponse = await fetch('http://localhost:3000/user/v1/addInstituteAdmin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Add the token to the headers
+                },
+                body: JSON.stringify({
+                    username: formData.username,
+                    password: formData.password,
+                    instituteKey: formData.instituteKey
+                })
+            });
+
+            if (!adminResponse.ok) {
+                const adminErrorData = await adminResponse.json();
+                throw new Error(adminErrorData.message || 'Error adding institute admin');
             }
 
             setSuccess(true);
-            setFormData({ username: '', password: '', instituteKey: '', instituteName: '', language: '' }); // Reset form including language
+            setFormData({ username: '', password: '', instituteKey: '', instituteName: '', allowedLanguages: [] }); // Reset form
         } catch (err) {
             setError(err.message);
         } finally {
@@ -88,14 +136,30 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
                     required
                     style={{ borderRadius: '5px' }}
                 />
-                <Form.Input
-                    label="Language" // Added language input
-                    name="language"
-                    value={formData.language}
-                    onChange={handleChange}
-                    required
-                    style={{ borderRadius: '5px' }}
-                />
+                <Form.Field required>
+                    <label>Allowed Languages</label>
+                    {loadingLanguages ? (
+                        <Dropdown
+                            placeholder="Loading languages..."
+                            fluid
+                            multiple
+                            selection
+                            disabled
+                            style={{ borderRadius: '5px' }}
+                        />
+                    ) : (
+                        <Dropdown
+                            placeholder="Select Languages"
+                            fluid
+                            multiple
+                            selection
+                            options={availableLanguages}
+                            value={formData.allowedLanguages}
+                            onChange={handleLanguageChange}
+                            style={{ borderRadius: '5px' }}
+                        />
+                    )}
+                </Form.Field>
                 <Message
                     success
                     header="Success"

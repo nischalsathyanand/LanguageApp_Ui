@@ -419,7 +419,7 @@ const ViewAllStudents = () => {
                   <Table.Cell>{student.rollno}</Table.Cell>
                   <Table.Cell>{student.instituteName}</Table.Cell>
                   <Table.Cell>{student.password}</Table.Cell>
-                  <Table.Cell>{student.language}</Table.Cell>
+                  <Table.Cell>{student.allowedLanguages}</Table.Cell>
                   <Table.Cell>{student.lastLoggedInTime}</Table.Cell>
                   <Table.Cell>
                     <Icon
