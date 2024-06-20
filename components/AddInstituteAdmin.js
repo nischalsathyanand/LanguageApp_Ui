@@ -7,7 +7,8 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
         password: '',
         instituteKey: '',
         instituteName: '',
-        allowedLanguages: []
+        allowedLanguages: [],
+        studentMaxLimit: 0 // Added studentMaxLimit to formData state
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -59,7 +60,8 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
                 body: JSON.stringify({
                     instituteName: formData.instituteName,
                     instituteKey: formData.instituteKey,
-                    allowedLanguages: formData.allowedLanguages
+                    allowedLanguages: formData.allowedLanguages,
+                    studentMaxLimit: formData.studentMaxLimit // Include studentMaxLimit in the request
                 })
             });
 
@@ -88,7 +90,7 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
             }
 
             setSuccess(true);
-            setFormData({ username: '', password: '', instituteKey: '', instituteName: '', allowedLanguages: [] }); // Reset form
+            setFormData({ username: '', password: '', instituteKey: '', instituteName: '', allowedLanguages: [], studentMaxLimit: 0 }); // Reset form
         } catch (err) {
             setError(err.message);
         } finally {
@@ -160,6 +162,15 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
                         />
                     )}
                 </Form.Field>
+                <Form.Input
+                    label="Student Max Limit"
+                    name="studentMaxLimit"
+                    type="number"
+                    value={formData.studentMaxLimit}
+                    onChange={handleChange}
+                    required
+                    style={{ borderRadius: '5px' }}
+                />
                 <Message
                     success
                     header="Success"
