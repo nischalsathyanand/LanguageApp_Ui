@@ -64,7 +64,7 @@ const StudentHome = () => {
   };
 
   const languageCodeMap = {
-    English: "us",
+    English: "gb",
     Spanish: "es",
     French: "fr",
     German: "de",
