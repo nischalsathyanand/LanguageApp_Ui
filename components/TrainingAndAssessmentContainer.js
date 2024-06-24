@@ -99,14 +99,15 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
       style={{
         background: "#fff",
         borderRadius: "10px",
-        boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+        // boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
         width: "100%",
         margin: 0,
-        height: "auto",
-        minHight:'100vh',
+        maxHeight: "100%",
+        // minHight:'100vh',
         boxSizing: "border-box",
-        padding: "20px",
+        padding: "10px",
         margin: "0px",
+        position:'relative'
       }}
     >
       <div
@@ -114,12 +115,13 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "10px",
-          height: "auto",
+          marginBottom: "0px",
+          maxHeight: "10%",
           width: "100%",
+          position:'relative'
         }}
       >
-        <div>
+        <div >
           <Icon name="heart" color="red" />
           <span
             style={{ marginLeft: "5px", fontWeight: "bold", fontSize: "20px" }}
@@ -140,16 +142,16 @@ const TrainingAndAssessmentContainer = observer(({ selectedLessonId, selectedCha
         style={{
           position: "relative",
           objectFit: "cover",
-          height: "auto",
+          maxHeight: "90%",
           maxWidth: "100%",
           top: "30px",
           padding: "0px",
-          margin: "20px",
+          margin: "10px",
         }}
       >
         {showConfetti ? (
-          <div style={{ textAlign: "center" }}>
-            <Header as="h2" style={{ color: "#21ba45", marginBottom: "20px" }}>
+          <div style={{ textAlign: "center",maxHeight:'77vh',position:'relative' }}>
+            <Header as="h2" style={{ color: "#21ba45", marginBottom: "20px"}}>
               Congratulations! You have completed all parts.
             </Header>
             <p>Completed Time: {completedTime}</p>

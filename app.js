@@ -7,6 +7,7 @@ import StudentHome from './components/StudentHome';
 import HomePage from './components/HomePage';
 import Unauthorized from './Unauthorized';
 import ProtectedRoute from './utils/ProtectedRoute';
+import Languages from './components/Languages';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+
         <Route 
           path="/superadmin" 
           element={
@@ -36,6 +38,14 @@ function App() {
           element={
             <ProtectedRoute role="student">
               <StudentHome />
+            </ProtectedRoute>
+          } 
+        />
+         <Route 
+          path="/languages" 
+          element={
+            <ProtectedRoute role="student">
+              <Languages/>
             </ProtectedRoute>
           } 
         />

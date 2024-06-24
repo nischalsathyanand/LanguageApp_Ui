@@ -50,18 +50,18 @@ const Training = observer(({ questions, handleNext }) => {
   };
 
   return (
-    <Container textAlign="center" style={{ padding: '40px', background: '#fff', height:'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100vw', margin: 0 }}>
+    <Container textAlign="center" style={{ padding: '10px', background: '#fff', maxHeight:'77vh', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100vw', margin: 0 ,position:'relative'}}>
       {questions.length > 0 && currentIndex < questions.length ? (
-        <div style={{ margin: '0 auto', maxWidth: '600px' }}>
-          <Header as="h1" style={{ marginBottom: '30px', fontSize: '2.5em', color: '#333' }}>
+        <div style={{ margin: '0 auto', maxWidth: '600px',position:'relative',maxHeight:'100%' }}>
+          <Header as="h1" style={{ marginBottom: '10px', fontSize: '2.5em', color: '#333' }}>
             {questions[currentIndex].text}
           </Header>
-          <Card centered style={{ width: '350px', height: '350px', margin: '0 auto', marginBottom: '30px', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
+          <Card centered style={{ width: '300px', height: '300px', margin: '0 auto', marginBottom: '30px', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}>
             <Transition animation="fade" duration={500} visible={true}>
               <Image src={getImageUrl(questions[currentIndex].image1)} style={{ height: '100%', objectFit: 'cover' }} />
             </Transition>
           </Card>
-          <div style={{ margin: '30px 0' }}>
+          <div style={{ margin: '20px 0' }}>
             <Button circular icon={audioPlaying ? 'pause' : 'play'} onClick={handlePlayAudio} primary size='large' />
             <Button circular icon='refresh' onClick={() => setAudioPlaying(false)} primary size='large' style={{ marginLeft: '15px' }} />
           </div>

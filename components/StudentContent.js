@@ -14,7 +14,8 @@ const colorPalette = {
 
 const getColorForChapter = (index) => colorPalette[index % Object.keys(colorPalette).length];
 
-const StudentContent = observer(({ selectedLanguage, username }) => {
+const StudentContent = observer(({ selectedLanguage }) => {
+  // console.log(selectedLanguage,username)
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -24,10 +25,22 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
   const [selectedChapterName, setSelectedChapterName] = useState('');
   const [completedLessons,setCompletedLessons]=useState([]);
   const[lessonCompleted,setLessonCompleted]=useState([]);
+  const [username, setUsername] = useState("Default Username");
+  const [name, setName] = useState("Default Username");
 
   const fetchCompletedLessons = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/user/${username}/completedChapters`);
+      const storedUsername = sessionStorage.getItem('username');
+    const studentName = sessionStorage.getItem('name')
+
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+    if (studentName) {
+      setName(studentName)
+    }
+
+      const response = await fetch(`http://localhost:3000/user/${storedUsername}/completedChapters`);
       if (!response.ok) throw new Error('Failed to fetch completed lessons');
       const data = await response.json();
       setCompletedLessons(data);
@@ -117,7 +130,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
     });
 
   
-    return isCompleted ? <Icon name='check' style={{ color: 'dimgray' }} /> : <Icon name='star' style={{ color: 'white' }} />;
+    return isCompleted ? <Icon name='check large' style={{ color: 'dimgray',fontWeight:'800' }} /> : <Icon name='star large' style={{ color: 'white' }} />;
   };
   
   const renderLessons = (lessons, chapterId,chapterName, color) => {
@@ -127,7 +140,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
 
     const centerX = 150; // Center X for the curved path
     const startY = 50; // Start Y position for the first button
-    const yStep = 90; // Vertical distance between buttons
+    const yStep = 110; // Vertical distance between buttons
     const xCurve = 60; // Increase the horizontal curvature factor
     const containerHeight = startY + (lessons.length - 1) * yStep + 100; // Dynamically calculate the container height
 
@@ -195,7 +208,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
                   <button
                     className={`lesson-button lesson-button-${index}`}
                     style={{
-                      backgroundColor: '#d6d327',
+                      backgroundColor: '#FFC90E',
                       width: '70px',
                       height: '70px',
                       border: 'none',
@@ -233,7 +246,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
   }, []);
 
   return (
-    <Container style={{ marginTop: '0em', padding: '2em' }}>
+    <Container style={{ marginTop: '0em', padding: '2em',backgroundColor:'#ffff',margin:'0px',position:'relative',height:'auto' }}>
       {loading ? (
         <Loader active inline='centered' />
       ) : error ? (
@@ -242,7 +255,7 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
           <p>{error}</p>
         </Message>
       ) : (
-        <div>
+        <div style={{margin:'0px',padding:'0px'}}>
           {chapters.map((chapter, index) => (
             <div key={chapter._id} style={{ marginBottom: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
               <div
@@ -253,11 +266,11 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
                   textAlign: 'center',
                   marginBottom: '0em',
                   padding: '0.5em',
-                  width: '70%',
+                  width: '60%',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
-                  minHeight: '80px',
+                  minHeight: '90px',
                   borderRadius: '15px',
                   fontSize: '20px',
                   fontFamily: 'timesNewRoman',
@@ -274,17 +287,20 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
             open={modalOpen}
             onClose={() => setModalOpen(false)}
             style={{
-              position: 'fixed',
+              position: 'absolute',
               top: 0,
               left: 0,
               width: '100%',
-              height: 'auto',
-              margin: 0,
+              height: '100vh',
+              margin: '0px',
+              padding:'0px',
               backgroundColor: 'white',
+              display:'flex',
+              flexDirection:'column'
             }}
           >
-            <Modal.Header>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Modal.Header style={{display:'flex', position:'relative',maxHeight:'7vh'}}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',position:'relative',maxHeight:'7vh' }}>
                 <Icon
                   size='large'
                   name='close'
@@ -292,10 +308,10 @@ const StudentContent = observer(({ selectedLanguage, username }) => {
                   onClick={() => setModalOpen(false)}
                 />
 
-                <div></div>
+                {/* <div></div> */}
               </div>
             </Modal.Header>
-            <Modal.Content>
+            <Modal.Content style={{display:'flex', position:'relative',maxHeight:'93vh',minHeight:'93vh'}}>
               <TrainingAndAssessmentContainer
                 questionSessionStore={questionSessionStore}
                 selectedLessonId={selectedLesson?._id}

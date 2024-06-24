@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Grid,
   Button,
@@ -11,14 +11,18 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import StudentContent from "./StudentContent";
 import StudentLanguageSelecter from "./StudentLanguageSelecter";
+import { LanguageContext } from './LanguageContext';
+import ReactCountryFlag from "react-country-flag";
 
 const StudentHome = () => {
   const [username, setUsername] = useState("Default Username");
   const [name, setName] = useState("Default Username");
-  const [languages, setLanguages] = useState([]);
-  const [selectedLanguage, setSelectedLanguage] = useState(null);
-  const [loadingLanguages, setLoadingLanguages] = useState(true);
+  // const [languages, setLanguages] = useState([]);
+  // const [selectedLanguage, setSelectedLanguage] = useState(null);
+  const { selectedLanguage, setSelectedLanguage } = useContext(LanguageContext);
+  const [loadingLanguages, setLoadingLanguages] = useState(false);
   const navigate = useNavigate();
+  console.log(selectedLanguage)
 
   useEffect(() => {
     // Fetch the username from session storage
@@ -33,29 +37,30 @@ const StudentHome = () => {
     }
 
     // Fetch languages
-    const fetchLanguages = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/v1/languages");
-        const data = await response.json();
-        setLanguages(data);
-      } catch (error) {
-        console.error("Error fetching languages:", error);
-      } finally {
-        setLoadingLanguages(false);
-      }
-    };
+    // const fetchLanguages = async () => {
+    //   try {
+    //     const response = await fetch("http://localhost:3000/api/v1/languages");
+    //     const data = await response.json();
+    //     setLanguages(data);
+    //   } catch (error) {
+    //     console.error("Error fetching languages:", error);
+    //   } finally {
+    //     setLoadingLanguages(false);
+    //   }
+    // };
 
-    fetchLanguages();
+    // fetchLanguages();
   }, []);
 
-  const handleLanguageChange = (language) => {
-    setSelectedLanguage(language);
-  };
+  // const handleLanguageChange = (language) => {
+  //   setSelectedLanguage(language);
+  // };
 
   const handleLogout = () => {
     // Clear session storage
+    localStorage.removeItem('selectedLanguage');
     sessionStorage.clear();
-    navigate("/login");
+    navigate("/home");
   };
 
   const languageCodeMap = {
@@ -73,21 +78,23 @@ const StudentHome = () => {
   };
 
   return (
-    <Grid celled stackable style={{ minHeight: "100vh", margin: '0px', padding: '0px', position: 'relative', borderRadius: '0px' }}>
+    <Grid celled stackable style={{ minHeight: "100vh", height:'auto', margin: '0px', padding: '0px', position: 'relative', borderRadius: '0px' }}>
       <Grid.Row centered style={{ borderRadius: '0px' }}>
         {/* Left Sidebar */}
         {/* Left Sidebar */}
-        <Grid.Column width={3} computer={3} tablet={4} mobile={16} style={{
+        <Grid.Column style={{
           position: "relative",
           top: "0",
           left: "0",
           bottom: "0",
-          maxWidth: "20%",
+          width: "18%",
           textAlign: "center",
-          padding: "2em 1em",
+          // padding: "1em 1em",
           backgroundColor: "white",
           display: "flex",
           flexDirection: "column",
+          overflowY: "hidden",
+          borderRight:'solid 1px'
           // justifyContent: "space-between",
         }}>
           <div
@@ -96,22 +103,22 @@ const StudentHome = () => {
               top: "0",
               left: "0",
               bottom: "0",
-              width: "20%",
+              width: "100%",
               textAlign: "center",
-              padding: "2em 1em",
+              // padding: "2em 1em",
               backgroundColor: "white",
               display: "flex",
               flexDirection: "column",
+              overflowY: "hidden",
               // justifyContent: "space-between",
             }}
           >
-            <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Header
-                as="h1"
-                style={{ color: "#58CC02", marginBottom: "2em", marginTop: '1em' }}
+            <div style={{ position: 'fixed', height: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <h1
+                style={{ color: "#58CC02", marginBottom: "1em", marginTop: '1em',fontWeight:'750',fontFamily:'sans-serif',fontSize:'30px' }}
               >
                 Lantoon
-              </Header>
+              </h1>
               {/* <StepGroup vertical size="big" style={{ marginTop: "5em" }}>
                   <Step active>
                     <Icon name="home" />
@@ -127,15 +134,15 @@ const StudentHome = () => {
                   </Step>
                 </StepGroup> */}
               <NavLink
-                to="/learn"
+                // to="/learn"
                 style={{
-                  color: "blue",
+                  color: "#60A5FA",
                   position: 'relative',
                   minHeight: '60px',
-                  minWidth: '190px',
+                  minWidth: '90%',
                   fontWeight: "bold",
-                  backgroundColor: "lightSkyBlue",
-                  border: "1px solid blue",
+                  backgroundColor: "#DDF4FF",
+                  border: "1px solid #60A5FA",
                   paddingLeft: '10px',
                   borderRadius: '15px',
                   marginBottom: '10px',
@@ -152,13 +159,13 @@ const StudentHome = () => {
               <NavLink
                 to="/leaderboards"
                 style={({ isActive }) => ({
-                  color: isActive ? "blue" : "gray",
+                  color: isActive ? "#60A5FA" : "gray",
                   position: 'relative',
                   minHeight: '60px',
-                  minWidth: '190px',
+                  minWidth: '95%',
                   fontWeight: "bold",
-                  backgroundColor: isActive ? "lightSkyBlue" : "white",
-                  border: isActive ? "1px solid blue" : "none",
+                  backgroundColor: isActive ? "#DDF4FF" : "white",
+                  border: isActive ? "1px solid #60A5FA" : "none",
                   paddingLeft: '10px',
                   borderRadius: '15px',
                   marginBottom: '10px',
@@ -178,7 +185,7 @@ const StudentHome = () => {
                   color: "white",
                   fontWeight: "bold",
                   marginTop: '30px',
-                  backgroundColor: "lightcoral", // light red background
+                  backgroundColor: "red", // light red background
                   width: '150px',
                   height: '70px',
                   border: "2px solid lightcoral", // red border
@@ -188,8 +195,8 @@ const StudentHome = () => {
                   transition: 'background-color 0.3s, transform 0.3s' // smooth transition for hover effects
                 }}
                 onClick={handleLogout}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = "red"} // change to red on hover
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = "lightcoral"} // revert back to light red
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = "lightcoral"} // change to red on hover
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = "red"} // revert back to light red
               >
                 LOGOUT
               </button>
@@ -199,11 +206,8 @@ const StudentHome = () => {
         </Grid.Column>
         {/* Main Content */}
         <Grid.Column
-          width={13}
-          computer={13}
-          tablet={12}
-          mobile={16}
-          style={{ backgroundColor: "#f7f7f7", position: 'relative', padding: '0px', margin: '0px' }}
+         
+          style={{ backgroundColor: "#ffff", position: 'relative', padding: '0px', margin: '0px',width:'82%' }}
         >
           <Menu
             fixed="top"
@@ -234,10 +238,21 @@ const StudentHome = () => {
               >
                 {selectedLanguage && (
                   <>
-                    <Flag
+                  <ReactCountryFlag
+                  countryCode={languageCodeMap[selectedLanguage.name]}
+                  svg
+                  style={{
+                    width: '15%',
+                    height: '85%',
+                    marginLeft: '10px',
+                    position:"relative",
+                    borderRadius:'7px',
+                    border:'2px solid white'
+                  }}/>
+                    {/* <Flag
                       name={languageCodeMap[selectedLanguage.name]}
                       style={{ marginRight: "10px", fontSize: "2rem" }}
-                    />
+                    /> */}
                     {/* <span style={{ fontSize: "1.4rem" }}>
                       {selectedLanguage.name}
                     </span> */}
@@ -275,15 +290,18 @@ const StudentHome = () => {
             </Menu.Menu>
           </Menu>
 
-          <div style={{ marginTop: "50px" }}>
+          <div style={{ padding:'0px', backgroundColor:'#fff',position:'relative'}}>
             {selectedLanguage ? (
               <StudentContent selectedLanguage={selectedLanguage} username={username} />
             ) : (
-              <StudentLanguageSelecter
-                languages={languages}
-                languageCodeMap={languageCodeMap}
-                handleLanguageChange={handleLanguageChange}
-              />
+              // <StudentLanguageSelecter
+              //   languages={languages}
+              //   languageCodeMap={languageCodeMap}
+              //   handleLanguageChange={handleLanguageChange}
+              // />
+              <div>
+                there is no language selected 
+                </div>
             )}
           </div>
         </Grid.Column>
