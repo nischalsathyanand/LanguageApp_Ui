@@ -8,7 +8,7 @@ import {
   Loader,
   Flag,
 } from "semantic-ui-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import StudentContent from "./StudentContent";
 import StudentLanguageSelecter from "./StudentLanguageSelecter";
 import { LanguageContext } from './LanguageContext';
@@ -238,6 +238,7 @@ const StudentHome = () => {
               >
                 {selectedLanguage && (
                   <>
+                  <Link to='/languages'>
                   <ReactCountryFlag
                   countryCode={languageCodeMap[selectedLanguage.name]}
                   svg
@@ -248,7 +249,9 @@ const StudentHome = () => {
                     position:"relative",
                     borderRadius:'7px',
                     border:'2px solid white'
-                  }}/>
+                  }} />
+                  </Link>
+                  
                     {/* <Flag
                       name={languageCodeMap[selectedLanguage.name]}
                       style={{ marginRight: "10px", fontSize: "2rem" }}
