@@ -7,6 +7,7 @@ const StudentLanguageSelecter = ({ languages, languageCodeMap, handleLanguageCha
   const navigate = useNavigate();
 
   useEffect(() => {
+    //fix this implementation
     const storedLanguages = sessionStorage.getItem('languages');
     if (storedLanguages) {
       setSelectedLanguages(JSON.parse(storedLanguages));

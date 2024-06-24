@@ -55,7 +55,7 @@ const StudentHome = () => {
   const handleLogout = () => {
     // Clear session storage
     sessionStorage.clear();
-    navigate("/login");
+    navigate("/home");
   };
 
   const languageCodeMap = {
