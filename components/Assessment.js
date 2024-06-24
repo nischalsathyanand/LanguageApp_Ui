@@ -63,19 +63,19 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "";
     const fileName = imagePath.split("/").slice(-2, -1)[0] + ".jpg";
-    return `http://localhost:3000/aws/data/${imagePath}right/${fileName}`;
+    return `/aws/data/${imagePath}right/${fileName}`;
   };
 
   const getAudioUrl = (audioPath) => {
     if (!audioPath) return "";
     const fileName = audioPath.split("/").slice(-2, -1)[0] + ".mp3";
-    return `http://localhost:3000/aws/data/${audioPath}${fileName}`;
+    return `/aws/data/${audioPath}${fileName}`;
   };
 
   const updateCompletedChapters = async (username,chapter_name, chapter_id, lesson_name,lesson_id, score,completedTime ) => {
     try {
    
-      const response = await fetch(`http://localhost:3000/user/${username}/completedChapters`, {
+      const response = await fetch(`/user/${username}/completedChapters`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
   useEffect(() => {
     const fetchGeneratedQuestions = async () => {
       try {
-        const response = await fetch("http://localhost:3000/v1/generate-questions", {
+        const response = await fetch("/v1/generate-questions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

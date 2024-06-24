@@ -67,7 +67,7 @@ const AddNewStudent = () => {
 
         try {
             // Check the current student count and limit before submitting the form
-            const checkResponse = await fetch('http://localhost:3000/user/v1/checkStudentLimit', {
+            const checkResponse = await fetch('/user/v1/checkStudentLimit', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -81,7 +81,7 @@ const AddNewStudent = () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:3000/user/v1/addsinglestudent', {
+            const response = await fetch('/user/v1/addsinglestudent', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

@@ -12,7 +12,7 @@ const EditLanguage = ({ language, open, onClose, onSuccess, onDelete }) => {
       return;
     }
 
-    fetch(`http://localhost:3000/api/v1/languages/${language._id}`, {
+    fetch(`/api/v1/languages/${language._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +33,7 @@ const EditLanguage = ({ language, open, onClose, onSuccess, onDelete }) => {
   };
 
   const handleDeleteLanguage = () => {
-    fetch(`http://localhost:3000/api/v1/languages/${language._id}`, {
+    fetch(`/api/v1/languages/${language._id}`, {
       method: "DELETE",
     })
       .then((response) => {

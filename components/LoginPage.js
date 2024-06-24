@@ -11,7 +11,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:3000/user/v1/login", {
+      const response = await fetch("/user/v1/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

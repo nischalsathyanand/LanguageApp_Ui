@@ -31,7 +31,7 @@ const AddCourse = ({ setActiveStep }) => {
   const fetchLanguages = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3000/api/v1/languages');
+      const response = await fetch('/api/v1/languages');
       const data = await response.json();
       setLanguages(data);
       setLoading(false);
@@ -53,7 +53,7 @@ const AddCourse = ({ setActiveStep }) => {
 
   const fetchChapters = async (languageId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/v1/languages/${languageId}/chapters`);
+      const response = await fetch(`/api/v1/languages/${languageId}/chapters`);
       const data = await response.json();
       setChapters(data);
     } catch (error) {
@@ -63,7 +63,7 @@ const AddCourse = ({ setActiveStep }) => {
 
   const fetchLessons = async (languageId, chapterId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/v1/languages/${languageId}/chapters/${chapterId}/lessons`);
+      const response = await fetch(`/api/v1/languages/${languageId}/chapters/${chapterId}/lessons`);
       const data = await response.json();
       setLessons(data);
     } catch (error) {
@@ -75,7 +75,7 @@ const AddCourse = ({ setActiveStep }) => {
     event.preventDefault();
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3000/api/v1/languages', {
+      const response = await fetch('/api/v1/languages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ const AddCourse = ({ setActiveStep }) => {
     event.preventDefault();
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}/chapters`, {
+      const response = await fetch(`/api/v1/languages/${selectedLanguage}/chapters`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ const AddCourse = ({ setActiveStep }) => {
     event.preventDefault();
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}/chapters/${selectedChapter}/lessons`, {
+      const response = await fetch(`/api/v1/languages/${selectedLanguage}/chapters/${selectedChapter}/lessons`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ const AddCourse = ({ setActiveStep }) => {
     event.preventDefault();
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}/chapters/${selectedChapter}/lessons/${selectedLesson}/questions`, {
+      const response = await fetch(`/api/v1/languages/${selectedLanguage}/chapters/${selectedChapter}/lessons/${selectedLesson}/questions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

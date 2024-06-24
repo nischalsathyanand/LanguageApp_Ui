@@ -129,7 +129,7 @@ const ViewAllStudents = () => {
         const token = localStorage.getItem("token");
         const instituteKey = sessionStorage.getItem("institutekey");
         const response = await fetch(
-          `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}`,
+          `/user/v1/getstudentdetails?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}`,
           {
             method: "GET",
             headers: {
@@ -178,7 +178,7 @@ const ViewAllStudents = () => {
         const token = localStorage.getItem("token");
         const instituteKey = sessionStorage.getItem("institutekey");
         const response = await fetch(
-          `http://localhost:3000/user/v1/getstudentdetails?instituteKey=${instituteKey}`,
+          `/user/v1/getstudentdetails?instituteKey=${instituteKey}`,
           {
             method: "GET",
             headers: {
@@ -230,7 +230,7 @@ const ViewAllStudents = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:3000/user/v1/deletestudent?studentId=${studentId}`,
+        `/user/v1/deletestudent?studentId=${studentId}`,
         {
           method: "DELETE",
           headers: {
@@ -325,7 +325,7 @@ const ViewAllStudents = () => {
       const token = localStorage.getItem("token");
       const instituteKey = sessionStorage.getItem("institutekey");
       const response = await fetch(
-        `http://localhost:3000/user/v1/download?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}&format=csv`,
+        `/user/v1/download?instituteKey=${instituteKey}&class=${selectedClass}&section=${selectedSection}&format=csv`,
         {
           method: "GET",
           headers: {

@@ -29,7 +29,7 @@ const Languages = () => {
   useEffect(() => {
     const fetchLanguages = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/v1/languages");
+        const response = await fetch("/api/v1/languages");
         const data = await response.json();
         setLanguages(data);
       } catch (error) {

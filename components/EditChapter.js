@@ -12,7 +12,7 @@ const EditChapter = ({ chapter, languageId, open, onClose, onSuccess, onDelete }
       return;
     }
   
-    fetch(`http://localhost:3000/api/v1/languages/${languageId}/chapters/${chapter._id}`, {
+    fetch(`/api/v1/languages/${languageId}/chapters/${chapter._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +34,7 @@ const EditChapter = ({ chapter, languageId, open, onClose, onSuccess, onDelete }
   };
 
   const handleDeleteChapter = () => {
-    fetch(`http://localhost:3000/api/v1/languages/${languageId}/chapters/${chapter._id}`, {
+    fetch(`/api/v1/languages/${languageId}/chapters/${chapter._id}`, {
       method: "DELETE",
     })
       .then((response) => {

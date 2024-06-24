@@ -20,7 +20,7 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
         // Fetch available languages
         const fetchLanguages = async () => {
             try {
-                const response = await fetch("http://localhost:3000/api/v1/languages");
+                const response = await fetch("/api/v1/languages");
                 const data = await response.json();
                 setAvailableLanguages(data.map(lang => ({ key: lang._id, text: lang.name, value: lang.name })));
             } catch (error) {
@@ -51,7 +51,7 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
 
         try {
             // First, create the institute
-            const response = await fetch('http://localhost:3000/user/v1/create-institute', {
+            const response = await fetch('/user/v1/create-institute', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const AddInstituteAdmin = ({ setActiveStep }) => {
             }
 
             // Now, add the admin
-            const adminResponse = await fetch('http://localhost:3000/user/v1/addInstituteAdmin', {
+            const adminResponse = await fetch('/user/v1/addInstituteAdmin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

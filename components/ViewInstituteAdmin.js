@@ -9,7 +9,7 @@ const ViewInstituteAdmin = () => {
     useEffect(() => {
         const fetchAdmins = async () => {
             try {
-                const response = await fetch('http://localhost:3000/user/v1/getInstituteAdmins', {
+                const response = await fetch('/user/v1/getInstituteAdmins', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

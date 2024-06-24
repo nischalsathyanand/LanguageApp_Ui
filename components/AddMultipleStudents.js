@@ -32,7 +32,7 @@ const AddMultipleStudents = () => {
             setUploading(true);
             
             // Check the current student count and limit before uploading
-            const checkResponse = await fetch('http://localhost:3000/user/v1/checkStudentLimit', {
+            const checkResponse = await fetch('/user/v1/checkStudentLimit', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -46,7 +46,7 @@ const AddMultipleStudents = () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:3000/user/v1/addStudent/upload', {
+            const response = await fetch('/user/v1/addStudent/upload', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -73,7 +73,7 @@ const AddMultipleStudents = () => {
         const instituteKey = sessionStorage.getItem("institutekey");
 
         try {
-            const response = await fetch(`http://localhost:3000/user/v1/download/sample?instituteKey=${instituteKey}&format=csv`, {
+            const response = await fetch(`/user/v1/download/sample?instituteKey=${instituteKey}&format=csv`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,

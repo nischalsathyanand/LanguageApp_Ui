@@ -20,7 +20,7 @@ const ViewCourses = () => {
         setLoading(true);
         setError('');
 
-        fetch('http://localhost:3000/api/v1/languages')
+        fetch('/api/v1/languages')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch languages');
@@ -53,7 +53,7 @@ const ViewCourses = () => {
         setLoading(true);
         setError('');
 
-        fetch(`http://localhost:3000/api/v1/languages/${languageId}/chapters`)
+        fetch(`/api/v1/languages/${languageId}/chapters`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch chapters');
@@ -84,7 +84,7 @@ const ViewCourses = () => {
         setLoading(true);
         setError('');
 
-        fetch(`http://localhost:3000/api/v1/languages/${languageId}/chapters/${chapterId}/lessons`)
+        fetch(`/api/v1/languages/${languageId}/chapters/${chapterId}/lessons`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch lessons');
@@ -110,7 +110,7 @@ const ViewCourses = () => {
         setLoading(true);
         setError('');
 
-        fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}/chapters/${selectedChapter}/lessons/${selectedLesson}/questions`)
+        fetch(`/api/v1/languages/${selectedLanguage}/chapters/${selectedChapter}/lessons/${selectedLesson}/questions`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch questions');

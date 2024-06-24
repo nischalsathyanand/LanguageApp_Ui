@@ -29,7 +29,7 @@ const EditLesson = ({ lesson, open, onClose, onSuccess, chapters }) => {
       chapterId: chapterId,
     };
 
-    fetch(`http://localhost:3000/api/v1/lessons/${lesson._id}`, {
+    fetch(`/api/v1/lessons/${lesson._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -56,7 +56,7 @@ const EditLesson = ({ lesson, open, onClose, onSuccess, chapters }) => {
   const handleDeleteLesson = () => {
     setLoading(true);
 
-    fetch(`http://localhost:3000/api/v1/lessons/${lesson._id}`, {
+    fetch(`/api/v1/lessons/${lesson._id}`, {
       method: "DELETE",
     })
       .then((response) => {

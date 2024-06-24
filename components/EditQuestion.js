@@ -26,7 +26,7 @@ const EditQuestion = ({ question, open, onClose, onSuccess }) => {
       content: content,
     };
 
-    fetch(`http://localhost:3000/api/v1/questions/${question._id}`, {
+    fetch(`/api/v1/questions/${question._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ const EditQuestion = ({ question, open, onClose, onSuccess }) => {
   const handleDeleteQuestion = () => {
     setLoading(true);
 
-    fetch(`http://localhost:3000/api/v1/questions/${question._id}`, {
+    fetch(`/api/v1/questions/${question._id}`, {
       method: "DELETE",
     })
       .then((response) => {

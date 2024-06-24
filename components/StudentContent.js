@@ -39,7 +39,7 @@ const StudentContent = observer(({ selectedLanguage }) => {
         setName(studentName);
       }
 
-      const response = await fetch(`http://localhost:3000/user/${storedUsername}/completedChapters`);
+      const response = await fetch(`/user/${storedUsername}/completedChapters`);
       if (!response.ok) throw new Error('Failed to fetch completed lessons');
       const data = await response.json();
       setCompletedLessons(data);
@@ -60,12 +60,12 @@ const StudentContent = observer(({ selectedLanguage }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage._id}/chapters`);
+        const response = await fetch(`/api/v1/languages/${selectedLanguage._id}/chapters`);
         if (!response.ok) throw new Error('Failed to fetch chapters');
         const data = await response.json();
 
         const chaptersWithLessons = await Promise.all(data.map(async (chapter) => {
-          const lessonsResponse = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage._id}/chapters/${chapter._id}/lessons`);
+          const lessonsResponse = await fetch(`/api/v1/languages/${selectedLanguage._id}/chapters/${chapter._id}/lessons`);
           if (!lessonsResponse.ok) throw new Error('Failed to fetch lessons');
           const lessons = await lessonsResponse.json();
           return { ...chapter, lessons };
@@ -103,7 +103,7 @@ const StudentContent = observer(({ selectedLanguage }) => {
       setLoading(true);
       setPopupOpen(false);
       try {
-        const response = await fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage._id}/chapters/${selectedLesson.chapterId}/lessons/${selectedLesson._id}/questions`);
+        const response = await fetch(`/api/v1/languages/${selectedLanguage._id}/chapters/${selectedLesson.chapterId}/lessons/${selectedLesson._id}/questions`);
         if (!response.ok) throw new Error('Failed to fetch questions');
         const questions = await response.json();
         questionSessionStore.setQuestions(questions);

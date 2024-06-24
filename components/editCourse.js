@@ -18,7 +18,7 @@ const EditCourse = () => {
   }, []);
 
   const fetchLanguages = () => {
-    fetch("http://localhost:3000/api/v1/languages")
+    fetch("/api/v1/languages")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch languages");
@@ -35,7 +35,7 @@ const EditCourse = () => {
   };
 
   const fetchChapters = (languageId) => {
-    fetch(`http://localhost:3000/api/v1/languages/${languageId}/chapters`)
+    fetch(`/api/v1/languages/${languageId}/chapters`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch chapters");
@@ -84,7 +84,7 @@ const EditCourse = () => {
   };
 
   const handleDeleteLanguage = () => {
-    fetch(`http://localhost:3000/api/v1/languages/${selectedLanguage}`, {
+    fetch(`/api/v1/languages/${selectedLanguage}`, {
       method: "DELETE",
     })
       .then((response) => {

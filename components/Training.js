@@ -41,12 +41,12 @@ const Training = observer(({ questions, handleNext }) => {
 
   const getImageUrl = (imagePath) => {
     const fileName = imagePath.split('/').slice(-2, -1)[0] + '.jpg';
-    return `http://localhost:3000/aws/data/${imagePath}right/${fileName}`;
+    return `/aws/data/${imagePath}right/${fileName}`;
   };
 
   const getAudioUrl = (audioPath) => {
     const fileName = audioPath.split('/').slice(-2, -1)[0] + '.mp3';
-    return `http://localhost:3000/aws/data/${audioPath}${fileName}`;
+    return `/aws/data/${audioPath}${fileName}`;
   };
 
   return (
