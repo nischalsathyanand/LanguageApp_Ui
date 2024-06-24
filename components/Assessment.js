@@ -128,28 +128,28 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
   }, [currentIndex, generatedQuestions]);
 
   return (
-    <Container fluid style={{ padding: '0', margin: '0', height: 'auto', alignItems: 'center', justifyContent: 'center', background: '#fff', position: 'relative' }}>
-      <div style={{ width: '100%', height: 'auto', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <div style={{ maxWidth: '600px', height: 'auto', position: 'relative' }}>
+    <Container fluid style={{ padding: '0', margin: '0', maxHeight:'77vh', alignItems: 'center', justifyContent: 'center', background: '#fff', position: 'absolute' }}>
+      <div style={{ width: '100%', maxHeight:'100%', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ maxWidth: '500px', maxHeight: '77vh', position: 'relative',display:'flex',flexDirection:'column' }}>
           {generatedQuestions.length > 0 && currentIndex < generatedQuestions.length && (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                <Header as="h1" textAlign="center" style={{ fontSize: '1.8em', color: '#333', margin: '0' }}>
+            <div style={{display:"flex",flexDirection:'column',justifyContent:'center',alignItems:'center',position:'relative',maxHeight:'75vh',padding:'0px',margin:'0px'}}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px',maxBlockSize:'100%',position:'relative',maxHeight:'7vh' }}>
+                <Header as="h1" textAlign="center" style={{ fontSize: '1.8em', color: '#333', margin: '0',position:'relative' }}>
                   {generatedQuestions[currentIndex].text}
                 </Header>
                 <Button icon='volume up' onClick={handlePlayAudio} style={{ marginLeft: '10px' }} />
               </div>
-              <Grid columns={2} centered stackable style={{ marginBottom: "20px", position: 'relative', display: 'flex', justifyContent: 'center' }}>
+              <Grid columns={2} centered stackable style={{ marginBottom: "10px", position: 'relative', display: 'flex', justifyContent: 'center',alignItems:'center',maxHeight:'93vh' }}>
                 {generatedQuestions[currentIndex].options.map((option, idx) => (
-                  <Grid.Column key={idx} style={{ padding: "10px", position: 'relative' }}>
+                  <Grid.Column key={idx} style={{ padding: "10px", position: 'relative',display:'flex',justifyContent:'center',alignItems:'center',maxHeight:'93vh' }}>
                     <Card
                       onClick={() => handleImageClick(option.correct)}
                       style={{
                         cursor: "pointer",
                         borderRadius: "10px",
                         boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                        width: '350px',
-                        height: '330px',
+                        width: '260px',
+                        height: '250px',
                         border: '2px solid #d1d1d1',
                         overflow: 'hidden'
                       }}
@@ -167,7 +167,7 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
                   </Grid.Column>
                 ))}
               </Grid>
-            </>
+              </div>
           )}
         </div>
       </div>
@@ -179,7 +179,7 @@ const Assessment = observer(({ questions, handleNext, isLastPart, selectedLesson
             backgroundColor: feedback.correct ? '#d4edda' : '#f8d7da',
             color: feedback.correct ? '#155724' : '#721c24',
             textAlign: 'center',
-            position: 'sticky',
+            position: 'fixed',
             bottom: '-3px',
             left: '0',
            

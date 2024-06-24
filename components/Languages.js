@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LanguageContext } from './LanguageContext';
+import StudentLanguageSelecter from './StudentLanguageSelecter';
+import { Loader } from 'semantic-ui-react';
 
-const HomePage = () => {
+const Languages = () => {
   const navigate = useNavigate();
+  const { selectedLanguage, setSelectedLanguage } = useContext(LanguageContext);
+  const [languages, setLanguages] = useState([]);
+  const [loadingLanguages, setLoadingLanguages] = useState(true);
   
-  const handleGetStart = () => {
-    navigate('/login');
-  };
-
   useEffect(() => {
     const stars = 100;
     const starfield = document.querySelector('.starfield');
@@ -17,23 +19,60 @@ const HomePage = () => {
       star.className = 'star';
       star.style.left = `${Math.random() * 100}%`;
       star.style.top = `${Math.random() * 100}%`;
-      star.style.animationDuration = `${10 + Math.random() * 10}s`;  // Faster movement
-      star.style.animationDelay = `${Math.random() * 5}s`;  // Start at different times
+      star.style.animationDuration = `${10 + Math.random() * 10}s`;
+      star.style.animationDelay = `${Math.random() * 5}s`;
       
       starfield.appendChild(star);
     }
   }, []);
+  
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/v1/languages");
+        const data = await response.json();
+        setLanguages(data);
+      } catch (error) {
+        console.error("Error fetching languages:", error);
+      } finally {
+        setLoadingLanguages(false);
+      }
+    };
+
+    fetchLanguages();
+  }, []);
+
+ const handleLanguageChange = (language) => {
+    setSelectedLanguage(language);
+    navigate(`/student`);
+  };
+
+  const languageCodeMap = {
+    English: "us",
+    Spanish: "es",
+    French: "fr",
+    German: "de",
+    Hindi: "in",
+    Italian: "it",
+    Japanese: "jp",
+    Mandarin: "cn",
+    Sanskrit: "in",
+    Malayalam: "in",
+    Tamil: "in",
+  };
 
   const styles = {
     homepage: {
       position: 'relative',
-      overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '100vh',
+      minHeight: '100vh',
       backgroundColor: '#235390',
+      backgroundImage: 'url(/path-to-your-background-image.png)', // Add your background image URL here
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       color: 'white',
       textAlign: 'center',
     },
@@ -44,6 +83,7 @@ const HomePage = () => {
       width: '100%',
       height: '100%',
       overflow: 'hidden',
+      zIndex: 0,
     },
     star: {
       position: 'absolute',
@@ -58,6 +98,7 @@ const HomePage = () => {
     header: {
       fontSize: '2.5em',
       fontWeight: 'bold',
+      marginTop: '2em',
       marginBottom: '2em',
       zIndex: 1,
     },
@@ -114,17 +155,20 @@ const HomePage = () => {
       <div style={styles.header}>Lantoon</div>
       <div style={styles.content}>
         <div style={styles.tagline}>Learn a new language the way you learn best</div>
-        <button
-          style={styles.getStartedButton}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = styles.getStartedButtonHover.backgroundColor)}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = styles.getStartedButton.backgroundColor)}
-          onClick={handleGetStart}
-        >
-          Get Started
-        </button>
+        <div style={{ width: '80vw', position: 'relative', height: 'auto',display:'flex',justifyContent:'center',alignItems:'center' }}>
+          {
+            loadingLanguages ? <Loader /> : (
+              <StudentLanguageSelecter
+                languages={languages}
+                languageCodeMap={languageCodeMap}
+                handleLanguageChange={handleLanguageChange}
+              />
+            )
+          }
+        </div>
       </div>
     </div>
   );
 };
 
-export default HomePage;
+export default Languages;

@@ -40,7 +40,7 @@ sessionStorage.setItem('languages', JSON.stringify(userInfo.allowedLanguages));
       } else if (userInfo.role === 'instituteadmin') {
         navigate('/instituteadmin');
       } else if (userInfo.role === 'student') {
-        navigate('/student');
+        navigate('/languages');
       }
     } catch (error) {
       setError(error.message);

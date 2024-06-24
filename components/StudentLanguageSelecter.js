@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Card, Header, Flag, Icon } from "semantic-ui-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Card, Icon } from "semantic-ui-react";
+import ReactCountryFlag from "react-country-flag";
 
 const StudentLanguageSelecter = ({ languages, languageCodeMap, handleLanguageChange }) => {
   const [selectedLanguages, setSelectedLanguages] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     //fix this implementation
@@ -17,14 +16,12 @@ const StudentLanguageSelecter = ({ languages, languageCodeMap, handleLanguageCha
   const handleCardClick = (language) => {
     if (selectedLanguages.includes(language.name)) {
       handleLanguageChange(language);
-    
     }
   };
 
   return (
-    <div style={{ padding: "2em" }}>
-      <h2 style={{ textAlign: "center", color: "#58CC02" }}>My Languages...</h2>
-      <Card.Group itemsPerRow={4}>
+    <div style={{ width: "100vw", position: "relative", height: "auto", backgroundColor: "transparent", padding: "2em", boxShadow: "none" }}>
+      <Card.Group itemsPerRow={4} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: "50px" }}>
         {languages.map((language) => (
           <Card
             key={language._id}
@@ -32,27 +29,56 @@ const StudentLanguageSelecter = ({ languages, languageCodeMap, handleLanguageCha
             style={{
               cursor: selectedLanguages.includes(language.name) ? "pointer" : "not-allowed",
               opacity: selectedLanguages.includes(language.name) ? 1 : 0.3,
-              backgroundColor: selectedLanguages.includes(language.name) ? "#ffffff" : "#f2f2f2",
+              backgroundColor: "transparent",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
+              width: "23%", // Ensures card width adapts to its container
+              paddingBottom: "15%", // This ensures a square aspect ratio
+              position: "relative", // Needed for the content wrapper
+              boxShadow: "none"
             }}
           >
-            <Card.Content
+            <div
               style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
+                justifyContent: "center",
                 alignItems: "center",
               }}
             >
-              <Flag
-                name={languageCodeMap[language.name]}
-                style={{ marginBottom: "10px", fontSize: "4rem" }}
-              />
-              <Header as="h3">{language.name}</Header>
-              <Icon
-                name={selectedLanguages.includes(language.name) ? "unlock alternate" : "lock"}
-                color={selectedLanguages.includes(language.name) ? "green" : "red"}
-                style={{ marginTop: "10px" }}
-              />
-            </Card.Content>
+              <Card.Content
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  width: "100%",
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  position: 'relative',
+                  height: '100%'
+                }}
+              >
+                <ReactCountryFlag
+                  countryCode={languageCodeMap[language.name]}
+                  svg
+                  style={{
+                    width: '50%',
+                    height: '50%',
+                    marginBottom: '5px'
+                  }}
+                />
+                <h3 style={{ margin: '0px', padding: '0px',color:'#ffff' }}>{language.name}</h3>
+                <Icon
+                  name={selectedLanguages.includes(language.name) ? "unlock alternate" : "lock"}
+                  color={selectedLanguages.includes(language.name) ? "green" : "red"}
+                  style={{ marginTop: "10px" }}
+                />
+              </Card.Content>
+            </div>
           </Card>
         ))}
       </Card.Group>
