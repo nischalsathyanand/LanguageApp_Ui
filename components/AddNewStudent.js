@@ -66,6 +66,21 @@ const AddNewStudent = () => {
         const token = localStorage.getItem('token');
 
         try {
+            // Check the current student count and limit before submitting the form
+            const checkResponse = await fetch('http://localhost:3000/user/v1/checkStudentLimit', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const checkResult = await checkResponse.json();
+            if (checkResult.exceeded) {
+                setError('Student limit exceeded. Cannot add more students.');
+                setLoading(false);
+                return;
+            }
+
             const response = await fetch('http://localhost:3000/user/v1/addsinglestudent', {
                 method: 'POST',
                 headers: {

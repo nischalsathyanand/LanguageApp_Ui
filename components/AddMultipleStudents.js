@@ -27,16 +27,31 @@ const AddMultipleStudents = () => {
         formData.append('csvFile', file);
 
         const token = localStorage.getItem('token');
-        console.log(token); // Adjust this according to how you store the token
 
         try {
             setUploading(true);
+            
+            // Check the current student count and limit before uploading
+            const checkResponse = await fetch('http://localhost:3000/user/v1/checkStudentLimit', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const checkResult = await checkResponse.json();
+            if (checkResult.exceeded) {
+                setMessage('Student limit exceeded. Cannot upload more students.');
+                setUploading(false);
+                return;
+            }
+
             const response = await fetch('http://localhost:3000/user/v1/addStudent/upload', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
                 },
-                body: formData
+                body: formData,
             });
 
             const result = await response.json();
@@ -56,21 +71,21 @@ const AddMultipleStudents = () => {
     const handleDownloadSample = async () => {
         const token = localStorage.getItem('token');
         const instituteKey = sessionStorage.getItem("institutekey");
-    
+
         try {
             const response = await fetch(`http://localhost:3000/user/v1/download/sample?instituteKey=${instituteKey}&format=csv`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
                 }
             });
-    
+
             if (!response.ok) {
                 const result = await response.json();
                 setMessage(`Error: ${result.message}`);
                 return;
             }
-    
+
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -84,7 +99,7 @@ const AddMultipleStudents = () => {
             setMessage('Error downloading sample CSV');
         }
     };
-    
+
     return (
         <Segment>
             <Header as='h4'>Upload CSV to Add Multiple Students</Header>
