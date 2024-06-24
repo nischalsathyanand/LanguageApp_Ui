@@ -9,13 +9,11 @@ const colorPalette = {
   0: "#CE82FF",
   1: "#00CD9C",
   2: "#58CC02",
-
 };
 
 const getColorForChapter = (index) => colorPalette[index % Object.keys(colorPalette).length];
 
 const StudentContent = observer(({ selectedLanguage }) => {
-  // console.log(selectedLanguage,username)
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -23,22 +21,23 @@ const StudentContent = observer(({ selectedLanguage }) => {
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedChapterName, setSelectedChapterName] = useState('');
-  const [completedLessons,setCompletedLessons]=useState([]);
-  const[lessonCompleted,setLessonCompleted]=useState([]);
+  const [completedLessons, setCompletedLessons] = useState([]);
+  const [lessonCompleted, setLessonCompleted] = useState([]);
+  const [toastMessage, setToastMessage] = useState('');
   const [username, setUsername] = useState("Default Username");
   const [name, setName] = useState("Default Username");
 
   const fetchCompletedLessons = async () => {
     try {
       const storedUsername = sessionStorage.getItem('username');
-    const studentName = sessionStorage.getItem('name')
+      const studentName = sessionStorage.getItem('name');
 
-    if (storedUsername) {
-      setUsername(storedUsername);
-    }
-    if (studentName) {
-      setName(studentName)
-    }
+      if (storedUsername) {
+        setUsername(storedUsername);
+      }
+      if (studentName) {
+        setName(studentName);
+      }
 
       const response = await fetch(`http://localhost:3000/user/${storedUsername}/completedChapters`);
       if (!response.ok) throw new Error('Failed to fetch completed lessons');
@@ -52,7 +51,7 @@ const StudentContent = observer(({ selectedLanguage }) => {
 
   useEffect(() => {
     fetchCompletedLessons();
-  }, [username, lessonCompleted]); 
+  }, [username, lessonCompleted]);
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -84,10 +83,19 @@ const StudentContent = observer(({ selectedLanguage }) => {
     fetchChapters();
   }, [selectedLanguage]);
 
-  const handleLessonClick = (lesson, chapterId,chapterName) => {
-    setSelectedLesson({ ...lesson, chapterId });
-    setSelectedChapterName(chapterName);
-    setPopupOpen(true);
+  const handleLessonClick = (lesson, chapterId, chapterName) => {
+    const isCompleted = completedLessons.some(chapter => 
+      chapter.chapter_id === chapterId && chapter.completedLessons.some(l => l.lesson_id === lesson._id)
+    );
+
+    if (isCompleted) {
+      setToastMessage('Lesson already completed');
+      setTimeout(() => setToastMessage(''), 3000);
+    } else {
+      setSelectedLesson({ ...lesson, chapterId });
+      setSelectedChapterName(chapterName);
+      setPopupOpen(true);
+    }
   };
 
   const handleStartClick = async () => {
@@ -109,47 +117,78 @@ const StudentContent = observer(({ selectedLanguage }) => {
       }
     }
   };
-  const renderLessonIcons = (lessonId, chapterId) => {
-  
-    let isCompleted = false;
-  
-    // Iterate through chapters to find the matching chapterId
-    completedLessons.forEach(chapter => {
 
- 
-    
+  const renderLessonIcons = (lessonId, chapterId) => {
+    let isCompleted = false;
+    let isNext = false;
+
+    completedLessons.forEach(chapter => {
       if (chapter.chapter_id === chapterId) {
-    
-        // Check if lessonId exists in the completedLessons array of the current chapter
         isCompleted = chapter.completedLessons.some(lesson => lesson.lesson_id === lessonId);
-        return; // Exit loop once found
-      }
-      else{
-        isCompleted === false;
       }
     });
 
-  
-    return isCompleted ? <Icon name='check large' style={{ color: 'dimgray',fontWeight:'800' }} /> : <Icon name='star large' style={{ color: 'white' }} />;
+    // Determine if the lesson is the next accessible one
+    const chapterIndex = chapters.findIndex(chapter => chapter._id === chapterId);
+    const lessonIndex = chapters[chapterIndex].lessons.findIndex(lesson => lesson._id === lessonId);
+
+    if (chapterIndex === 0 && lessonIndex === 0) {
+      isNext = true;
+    } else if (chapterIndex !== -1 && lessonIndex !== -1) {
+      if (lessonIndex > 0) {
+        const prevLesson = chapters[chapterIndex].lessons[lessonIndex - 1];
+        isNext = completedLessons.some(chapter => 
+          chapter.chapter_id === chapterId && chapter.completedLessons.some(l => l.lesson_id === prevLesson._id)
+        );
+      } else {
+        const prevChapter = chapters[chapterIndex - 1];
+        isNext = completedLessons.some(chapter => 
+          chapter.chapter_id === prevChapter._id && chapter.completedLessons.length === prevChapter.lessons.length
+        );
+      }
+    }
+
+    // if (isCompleted) {
+    //   return <Icon name='check large' style={{ color: 'gray' }} />;
+    // } 
+    // else if (isNext) {
+    //   return <Icon name='star large' style={{ color: 'white' }} />;
+    // } 
+    // else if(isAccessible && !isCompleted ){
+    //   return <Icon name='star large' style={{ color: 'white' }} />;
+    // }
+    // else {
+    //   return <Icon name='lock large' style={{ color: 'gray' }} />;
+    // }
   };
-  
-  const renderLessons = (lessons, chapterId,chapterName, color) => {
+
+  const renderLessons = (lessons, chapterId, chapterName, color) => {
     if (!lessons || lessons.length === 0) {
       return <p style={{ color: '#999' }}>No lessons found for this chapter.</p>;
     }
 
-    const centerX = 150; // Center X for the curved path
-    const startY = 50; // Start Y position for the first button
-    const yStep = 110; // Vertical distance between buttons
-    const xCurve = 60; // Increase the horizontal curvature factor
-    const containerHeight = startY + (lessons.length - 1) * yStep + 100; // Dynamically calculate the container height
+    const centerX = 150;
+    const startY = 50;
+    const yStep = 110;
+    const xCurve = 60;
+    const containerHeight = startY + (lessons.length - 1) * yStep + 100;
 
     return (
       <div className="lessons-container-outer" style={{ width: '300px', margin: 'auto', zIndex: '1' }}>
         <div className="lessons-container-inner" style={{ position: 'relative', height: `${containerHeight}px` }}>
           {lessons.map((lesson, index) => {
             const buttonY = startY + index * yStep;
-            const buttonX = centerX + Math.sin(index * 1) * xCurve; // Increase the frequency of the sine function
+            const buttonX = centerX + Math.sin(index * 1) * xCurve;
+
+            const isCompleted = completedLessons.some(chapter => 
+              chapter.chapter_id === chapterId && chapter.completedLessons.some(l => l.lesson_id === lesson._id)
+            );
+
+            const isNext = index === 0 || (index > 0 && completedLessons.some(chapter => 
+              chapter.chapter_id === chapterId && chapter.completedLessons.some(l => l.lesson_id === lessons[index - 1]._id)
+            ));
+
+            const isAccessible = isCompleted || isNext;
 
             return (
               <Popup
@@ -169,7 +208,7 @@ const StudentContent = observer(({ selectedLanguage }) => {
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    zIndex: 1000, // Add z-index to ensure the popup is above other elements
+                    zIndex: 1000,
                   }}>
                     <div style={{
                       color: 'white',
@@ -179,50 +218,66 @@ const StudentContent = observer(({ selectedLanguage }) => {
                     }}>
                       {lesson.name}
                     </div>
-                    <button
-                      style={{
-                        padding: '0.8em 2em',
-                        fontSize: '1em',
-                        backgroundColor: 'white',
-                        color: color,
-                        width: '70%',
-                        height: '40%',
-                        borderRadius: '15px',
-                        border: 'none',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Default box shadow
-                        transition: 'box-shadow 0.3s ease', // Transition for smooth animation
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.4)'} // Hover box shadow
-                      onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'} // Revert to default on leave
-                      onClick={handleStartClick}
-                    >
-                      Start
-                    </button>
+                    {isAccessible && (
+                      <button
+                        style={{
+                          padding: '0.8em 2em',
+                          fontSize: '1em',
+                          backgroundColor: 'white',
+                          color: color,
+                          width: '70%',
+                          height: '40%',
+                          borderRadius: '15px',
+                          border: 'none',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                          transition: 'box-shadow 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.4)'}
+                        onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'}
+                        onClick={handleStartClick}
+                      >
+                        Start
+                      </button>
+                    )}
                   </div>
                 )}
                 trigger={
                   <button
                     className={`lesson-button lesson-button-${index}`}
                     style={{
-                      backgroundColor: '#FFC90E',
+                      backgroundColor: isAccessible && !isCompleted ? color : (isCompleted ? '#FACC15' : '#D3D3D3'),
                       width: '70px',
                       height: '70px',
                       border: 'none',
                       boxShadow: '0 4px 8px rgba(55, 70, 0, 2)',
                       borderRadius: '50%',
                       position: 'absolute',
-                      cursor: 'pointer',
+                      cursor: isAccessible ? 'pointer' : 'not-allowed',
                       left: `${buttonX}px`,
                       top: `${buttonY}px`,
                     }}
-                    onClick={() => handleLessonClick(lesson, chapterId,chapterName)}
+                    onClick={() => isAccessible && handleLessonClick(lesson, chapterId, chapterName)}
                   >
-                    {/* <Icon name='check large' style={{ color: 'white' }} /> */}
-                    {renderLessonIcons(lesson._id,chapterId)}
+                    {isAccessible && !isCompleted ?
+
+                    (
+                      <Icon name='star large' style={{ color: 'white' }} />
+                    ) :
+                    !isAccessible && !isCompleted ?
+
+                    (
+                      <Icon name='lock large' style={{ color: 'gray' }} />
+                    ) :
+                     (
+                      <Icon name='check large' style={{ color: 'gray' }} />
+                     )
+
+                    }
+                    {renderLessonIcons(lesson._id, chapterId)}
                   </button>
                 }
               />
@@ -233,7 +288,6 @@ const StudentContent = observer(({ selectedLanguage }) => {
     );
   };
 
-  // Add scroll event listener and clean up on unmount
   useEffect(() => {
     const handleScroll = () => {
       setPopupOpen(false);
@@ -244,9 +298,15 @@ const StudentContent = observer(({ selectedLanguage }) => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+  
+  const handleModalClose = () =>{
+    questionSessionStore.clear();
+   setModalOpen(false);
+  }
+
 
   return (
-    <Container style={{ marginTop: '0em', padding: '2em',backgroundColor:'#ffff',margin:'0px',position:'relative',height:'auto' }}>
+    <Container style={{ marginTop: '0em', padding: '2em', backgroundColor: '#ffff', margin: '0px', position: 'relative', height: 'auto' }}>
       {loading ? (
         <Loader active inline='centered' />
       ) : error ? (
@@ -255,14 +315,14 @@ const StudentContent = observer(({ selectedLanguage }) => {
           <p>{error}</p>
         </Message>
       ) : (
-        <div style={{margin:'0px',padding:'0px'}}>
+        <div style={{ margin: '0px', padding: '0px' }}>
           {chapters.map((chapter, index) => (
             <div key={chapter._id} style={{ marginBottom: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
               <div
                 as='h2'
                 style={{
-                  backgroundColor: getColorForChapter(index), // Random color for each chapter
-                  color: 'white', // White text color for contrast
+                  backgroundColor: getColorForChapter(index),
+                  color: 'white',
                   textAlign: 'center',
                   marginBottom: '0em',
                   padding: '0.5em',
@@ -279,9 +339,17 @@ const StudentContent = observer(({ selectedLanguage }) => {
               >
                 {chapter.name}
               </div>
-              {renderLessons(chapter.lessons, chapter._id,chapter.name, getColorForChapter(index))}
+              
+              {renderLessons(chapter.lessons, chapter._id, chapter.name, getColorForChapter(index))}
             </div>
           ))}
+
+          {toastMessage && (
+            <Message positive>
+              <Message.Header>Notification</Message.Header>
+              <p>{toastMessage}</p>
+            </Message>
+          )}
 
           <Modal
             open={modalOpen}
@@ -293,25 +361,23 @@ const StudentContent = observer(({ selectedLanguage }) => {
               width: '100%',
               height: '100vh',
               margin: '0px',
-              padding:'0px',
+              padding: '0px',
               backgroundColor: 'white',
-              display:'flex',
-              flexDirection:'column'
+              display: 'flex',
+              flexDirection: 'column'
             }}
           >
-            <Modal.Header style={{display:'flex', position:'relative',maxHeight:'7vh'}}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',position:'relative',maxHeight:'7vh' }}>
+            <Modal.Header style={{ display: 'flex', position: 'relative', maxHeight: '7vh' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', maxHeight: '7vh' }}>
                 <Icon
                   size='large'
                   name='close'
                   style={{ cursor: 'pointer' }}
-                  onClick={() => setModalOpen(false)}
+                  onClick={handleModalClose}
                 />
-
-                {/* <div></div> */}
               </div>
             </Modal.Header>
-            <Modal.Content style={{display:'flex', position:'relative',maxHeight:'93vh',minHeight:'93vh'}}>
+            <Modal.Content style={{ display: 'flex', position: 'relative', maxHeight: '93vh', minHeight: '93vh' }}>
               <TrainingAndAssessmentContainer
                 questionSessionStore={questionSessionStore}
                 selectedLessonId={selectedLesson?._id}
@@ -322,7 +388,6 @@ const StudentContent = observer(({ selectedLanguage }) => {
                 setModalOpen={setModalOpen}
                 onLessonComplete={() => setLessonCompleted(!lessonCompleted)}
               />
-
             </Modal.Content>
           </Modal>
         </div>

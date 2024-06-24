@@ -157,15 +157,15 @@ const StudentHome = () => {
                 LEARN
               </NavLink>
               <NavLink
-                to="/leaderboards"
+                to="/student"
                 style={({ isActive }) => ({
                   color: isActive ? "#60A5FA" : "gray",
                   position: 'relative',
                   minHeight: '60px',
                   minWidth: '95%',
                   fontWeight: "bold",
-                  backgroundColor: isActive ? "#DDF4FF" : "white",
-                  border: isActive ? "1px solid #60A5FA" : "none",
+                  backgroundColor:  "white",
+                  border:  "none",
                   paddingLeft: '10px',
                   borderRadius: '15px',
                   marginBottom: '10px',
@@ -249,9 +249,8 @@ const StudentHome = () => {
                     position:"relative",
                     borderRadius:'7px',
                     border:'2px solid white'
-                  }} />
+                  }}/>
                   </Link>
-                  
                     {/* <Flag
                       name={languageCodeMap[selectedLanguage.name]}
                       style={{ marginRight: "10px", fontSize: "2rem" }}
