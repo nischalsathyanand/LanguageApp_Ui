@@ -34,7 +34,7 @@ const Layout = styled.div`
   grid-template-columns: 250px 1fr;
   grid-template-rows: auto 1fr;
   height: 100vh;
-  margin-top: 70px; /* Adjust this value to match the height of the navbar */
+  margin-top: 0px; /* Adjust this value to match the height of the navbar */
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -53,7 +53,7 @@ const Sidebar = styled.div`
   color: #016FA4;
   position: fixed;
   left: 0;
-  top: 70px; /* Adjust this value to match the height of the navbar */
+  top: 0px; /* Adjust this value to match the height of the navbar */
   bottom: 0;
   z-index: 1000; /* Ensure it's above other content */
 

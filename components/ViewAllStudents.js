@@ -22,6 +22,8 @@ const StyledContainer = styled(Container)`
   margin: 0;
   width: 100%;
   max-width: 100%;
+  position:relative;
+  margin-top:100px;
 `;
 
 const StyledTable = styled(Table)`
@@ -350,7 +352,7 @@ const ViewAllStudents = () => {
   };
 
   return (
-    <StyledContainer fluid>
+    <StyledContainer fluid style={{height:'80%',position:'relative',padding:'0px',margin:'0px'}}>
       <Heading>Student Dashboard</Heading>
 
       <Dropdown
